@@ -1,4 +1,3 @@
-/* To learn more about this file see: https://angular.io/guide/testing#configure-testing-module. */
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
