@@ -23,14 +23,27 @@ services:
       - "3000:3000"
     volumes:
       - ./backend:/app
+      # Don't mount node_modules to prevent overriding container's node_modules
       - /app/node_modules
     environment:
       - NODE_ENV=development
       - PORT=3000
+      - MONGODB_URI=mongodb://db:27017/appdb
+      - FRONTEND_URL=http://localhost:4200
+      - DB_VENDO_BASE_URL=http://db-vendo:3000
     networks:
       - app-network
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+      db-vendo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
 
   db:
     image: mongo:latest
@@ -40,6 +53,31 @@ services:
       - mongo-data:/data/db
     networks:
       - app-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  db-vendo:
+    build:
+      context: ./db-vendo-custom
+      dockerfile: Dockerfile
+    container_name: db-vendo-container
+    ports:
+      - "3001:3000"
+    environment:
+      - USER_AGENT=refundrebel-dev-challenge1
+      - DB_PROFILE=dbnav
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
 networks:
   app-network:
