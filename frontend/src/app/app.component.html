@@ -1,11 +1,13 @@
 <div class="app-container">
-  <header>
-    <h1>Welcome to {{ title }}</h1>
-  </header>
+  <mat-toolbar color="primary">
+    <span>{{ title }}</span>
+  </mat-toolbar>
+  
   <main>
     <router-outlet></router-outlet>
   </main>
-  <footer>
-    <!-- Footer content will go here -->
-  </footer>
+  
+  <mat-toolbar color="primary" class="footer">
+    <span class="footer-content">{{ title }}</span>
+  </mat-toolbar>
 </div>

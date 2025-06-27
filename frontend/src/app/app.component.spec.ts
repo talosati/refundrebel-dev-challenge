@@ -1,6 +1,7 @@
 /// <reference types="@types/jasmine" />
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
@@ -9,9 +10,14 @@ describe('AppComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AppComponent],
+      imports: [
+        MatToolbarModule,
+        AppComponent
+      ],
     }).compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(AppComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -21,12 +27,12 @@ describe('AppComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it(`should have the 'refundrebel' title`, () => {
-    expect(component.title).toEqual('refundrebel');
+  it(`should have the 'RefundRebel' title`, () => {
+    expect(component.title).toEqual('RefundRebel');
   });
 
-  it('should render title', () => {
+  it('should render toolbar', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Welcome to refundrebel');
+    expect(compiled.querySelector('mat-toolbar')).toBeTruthy();
   });
 });
