@@ -3,18 +3,28 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { AppComponent } from './app.component';
+import { JourneyService } from '../services/journey.service';
 
 describe('AppComponent', () => {
   let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
 
+  let journeyServiceSpy: jasmine.SpyObj<JourneyService>;
+
   beforeEach(async () => {
+    const spy = jasmine.createSpyObj('JourneyService', ['getJourneys']);
+    
     await TestBed.configureTestingModule({
       imports: [
         MatToolbarModule,
         AppComponent
       ],
+      providers: [
+        { provide: JourneyService, useValue: spy }
+      ]
     }).compileComponents();
+
+    journeyServiceSpy = TestBed.inject(JourneyService) as jasmine.SpyObj<JourneyService>;
   });
 
   beforeEach(() => {

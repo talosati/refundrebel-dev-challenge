@@ -1,0 +1,89 @@
+<div class="journey-search">
+  <mat-card class="search-card">
+    <mat-card-header>
+      <mat-card-title>Search for Journeys</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <form [formGroup]="searchForm" (ngSubmit)="onSubmit()" class="search-form">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>From (Station ID)</mat-label>
+          <input 
+            matInput 
+            type="text" 
+            formControlName="from" 
+            placeholder="e.g., 8000105"
+            required>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>To (Station ID)</mat-label>
+          <input 
+            matInput 
+            type="text" 
+            formControlName="to" 
+            placeholder="e.g., 8010330"
+            required>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Departure</mat-label>
+          <input 
+            matInput 
+            type="datetime-local" 
+            formControlName="departure"
+            required>
+        </mat-form-field>
+        
+        <div class="button-container">
+          <button 
+            mat-raised-button 
+            color="primary" 
+            type="submit"
+            [disabled]="!searchForm.valid || isLoading"
+            class="search-button">
+            <span *ngIf="!isLoading">Search Journeys</span>
+            <span *ngIf="isLoading">
+              <mat-spinner diameter="20" class="spinner"></mat-spinner>
+              Searching...
+            </span>
+          </button>
+        </div>
+      </form>
+      
+      <div *ngIf="error" class="error-message">
+        <mat-error>{{ error }}</mat-error>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  
+  <div *ngIf="journeys && journeys.length > 0" class="results-container">
+    <h3>Search Results</h3>
+    <mat-card *ngFor="let journey of journeys" class="result-card">
+      <mat-card-content>
+        <div class="journey-info">
+          <div class="journey-header">
+            <span class="price" *ngIf="journey.price?.amount">
+              {{ journey.price.amount | currency: 'EUR' }}
+            </span>
+          </div>
+          
+          <div class="journey-details">
+            <div class="detail-row">
+              <mat-icon>location_on</mat-icon>
+              <span>From: {{ journey.from }}</span>
+            </div>
+            <div class="detail-row">
+              <mat-icon>location_on</mat-icon>
+              <span>To: {{ journey.to }}</span>
+            </div>
+            <div class="detail-row" *ngIf="journey.departure">
+              <mat-icon>schedule</mat-icon>
+              <span>Departs: {{ journey.departure | date:'medium' }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
