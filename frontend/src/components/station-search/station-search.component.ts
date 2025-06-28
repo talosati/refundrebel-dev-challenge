@@ -29,7 +29,7 @@ export class StationSearchComponent implements OnInit, OnDestroy {
   @Output() searchEvent = new EventEmitter<string>();
   searchTerm: string = '';
   stations: Station[] = [];
-  private subscription: Subscription = new Subscription();
+  private stationSubscription?: Subscription;
 
   constructor(private stationService: StationService) {}
 
@@ -38,20 +38,20 @@ export class StationSearchComponent implements OnInit, OnDestroy {
   }
 
   private loadStations(): void {
-    this.subscription.add(
-      this.stationService.getStations().subscribe({
+    this.stationSubscription?.unsubscribe();
+
+    this.stationSubscription = this.stationService.getStations().subscribe({
         next: (stations: Station[]) => {
           this.stations = stations;
         },
         error: (error) => {
           console.error('Error loading stations:', error);
         }
-      })
-    );
+      });
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    this.stationSubscription?.unsubscribe();
   }
 
   onSearch(): void {
