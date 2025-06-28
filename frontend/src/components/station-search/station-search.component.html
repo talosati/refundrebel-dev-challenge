@@ -5,27 +5,54 @@
     </mat-card-header>
     
     <mat-card-content>
-      <div class="search-form">
+      <form (submit)="$event.preventDefault(); onSearch()" class="search-form">
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Station Name or ID</mat-label>
+          <mat-label>Station Name</mat-label>
           <input 
             matInput 
-            type="text" 
+            type="text"
+            [matAutocomplete]="auto"
             [(ngModel)]="searchTerm"
-            name="searchTerm">
+            (input)="onInputChange($any($event.target).value)"
+            [placeholder]="!stationsLoaded ? 'Loading stations...' : 'Start typing a station name...'"
+            name="searchTerm"
+            [disabled]="!stationsLoaded"
+            #searchInput>
+          <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onOptionSelected($event.option.value)">
+            <mat-option *ngFor="let station of filteredStations | async" [value]="station">
+              {{ station.name }}
+            </mat-option>
+            <mat-option *ngIf="!stationsLoaded" disabled>
+              <div class="loading-option">
+                <mat-spinner diameter="20"></mat-spinner>
+                <span>Loading stations...</span>
+              </div>
+            </mat-option>
+            <mat-option *ngIf="stationsLoaded && (filteredStations | async)?.length === 0 && searchTerm" disabled>
+              No stations found for "{{ searchTerm }}"
+            </mat-option>
+          </mat-autocomplete>
+          <button 
+            matSuffix 
+            mat-icon-button 
+            *ngIf="searchTerm" 
+            (click)="onClear()"
+            type="button"
+            aria-label="Clear">
+            <mat-icon>close_small</mat-icon>
+          </button>
         </mat-form-field>
         
         <div class="button-container">
           <button 
             mat-raised-button 
             color="primary" 
-            type="button"
-            (click)="onSearch()"
-            class="search-button">
-            <span>Search Station</span>
+            type="submit"
+            [disabled]="!searchTerm.trim()">
+            Search
           </button>
         </div>
-      </div>
+      </form>
     </mat-card-content>
   </mat-card>
 </div>
