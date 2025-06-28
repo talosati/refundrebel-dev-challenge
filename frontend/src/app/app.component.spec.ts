@@ -8,6 +8,7 @@ import { JourneyService } from '../services/journey.service';
 describe('AppComponent', () => {
   let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
+  let compiled: HTMLElement;
 
   let journeyServiceSpy: jasmine.SpyObj<JourneyService>;
 
@@ -25,11 +26,9 @@ describe('AppComponent', () => {
     }).compileComponents();
 
     journeyServiceSpy = TestBed.inject(JourneyService) as jasmine.SpyObj<JourneyService>;
-  });
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(AppComponent);
     component = fixture.componentInstance;
+    compiled = fixture.nativeElement;
     fixture.detectChanges();
   });
 
@@ -37,12 +36,26 @@ describe('AppComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it(`should have the 'RefundRebel' title`, () => {
-    expect(component.title).toEqual('RefundRebel');
+  it('should have the correct title', () => {
+    expect(component.title).toBe('RefundRebel');
   });
 
-  it('should render toolbar', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('mat-toolbar')).toBeTruthy();
+  it('should render the title in the header toolbar', () => {
+    const headerToolbar = compiled.querySelector('mat-toolbar:first-child');
+    expect(headerToolbar?.textContent).toContain('RefundRebel');
+  });
+
+  it('should render the title in the footer toolbar', () => {
+    const footerToolbar = compiled.querySelector('.footer .footer-content');
+    expect(footerToolbar?.textContent).toContain('RefundRebel');
+  });
+
+  it('should render the journey-search component', () => {
+    expect(compiled.querySelector('app-journey-search')).toBeTruthy();
+  });
+
+  it('should have a main content container', () => {
+    expect(compiled.querySelector('main.main-content')).toBeTruthy();
+    expect(compiled.querySelector('.container')).toBeTruthy();
   });
 });
