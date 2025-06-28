@@ -1,10 +1,14 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { Station } from '../../services/station.service';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { HttpClient } from '@angular/common/http';
+import { StationService } from '../../services/station.service';
 
 @Component({
   selector: 'app-station-search',
@@ -15,17 +19,42 @@ import { MatButtonModule } from '@angular/material/button';
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
   ],
+  providers: [HttpClient],
   templateUrl: './station-search.component.html',
   styleUrls: ['./station-search.component.scss']
 })
-export class StationSearchComponent {
+export class StationSearchComponent implements OnInit, OnDestroy {
   @Output() searchEvent = new EventEmitter<string>();
   searchTerm: string = '';
+  stations: Station[] = [];
+  private subscription: Subscription = new Subscription();
+
+  constructor(private stationService: StationService) {}
+
+  ngOnInit(): void {
+    this.loadStations();
+  }
+
+  private loadStations(): void {
+    this.subscription.add(
+      this.stationService.getStations().subscribe({
+        next: (stations: Station[]) => {
+          this.stations = stations;
+        },
+        error: (error) => {
+          console.error('Error loading stations:', error);
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
 
   onSearch(): void {
-    console.log('Search button clicked!');
     if (this.searchTerm) {
       this.searchEvent.emit(this.searchTerm.trim());
     }

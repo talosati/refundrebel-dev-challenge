@@ -1,6 +1,5 @@
-const {readStations} = require('db-stations');
-
-const Station = require('../models/station.model');
+const { readStations } = require('db-stations');
+const Station = require('../models/station.model.js');
 
 class StationService {
   /**
@@ -9,7 +8,11 @@ class StationService {
    */
   static async getAllStations() {
     try {
-      return Station.fromRawStations(readStations);
+      const stations = [];
+      for await (const station of readStations()) {
+        stations.push(station);
+      }
+      return Station.fromRawStations(stations);
     } catch (error) {
       console.error('Error in StationService.getAllStations:', error.message);
       throw error;
