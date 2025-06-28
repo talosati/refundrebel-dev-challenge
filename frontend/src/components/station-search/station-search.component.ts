@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Subscription, Observable, of } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -9,6 +9,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTableModule } from '@angular/material/table';
+import { MatSortModule, MatSort } from '@angular/material/sort';
+import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Station, StationService } from '../../services/station.service';
 
@@ -26,6 +29,9 @@ import { Station, StationService } from '../../services/station.service';
     MatAutocompleteModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatTableModule,
+    MatSortModule,
+    MatPaginatorModule,
     HttpClientModule
   ],
   providers: [
@@ -38,11 +44,19 @@ import { Station, StationService } from '../../services/station.service';
 export class StationSearchComponent implements OnInit, OnDestroy {
   @Output() searchEvent = new EventEmitter<string>();
   @Output() arrivalsLoaded = new EventEmitter<any[]>();
+  @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  
   searchTerm: string = '';
   stations: Station[] = [];
   filteredStations: Observable<Station[]> = of([]);
   private stationSubscription?: Subscription;
   stationsLoaded = false;
+  
+  // Table properties
+  displayedColumns: string[] = ['station', 'line', 'arrival', 'delay', 'platform'];
+  arrivalsDataSource: any[] = [];
+  isLoading = false;
 
   constructor(private stationService: StationService) {}
 
@@ -120,27 +134,46 @@ export class StationSearchComponent implements OnInit, OnDestroy {
   }
 
   private getArrivals(stationId: string | number): void {
+    this.isLoading = true;
     this.stationService.getArrivals(stationId).subscribe({
       next: (response: any) => {
+        this.isLoading = false;
         if (response.success) {
           console.log('Arrivals data:', response.data);
+          this.arrivalsDataSource = response.data || [];
           this.arrivalsLoaded.emit(response.data);
         } else {
           console.error('Failed to load arrivals:', response.message);
+          this.arrivalsDataSource = [];
         }
       },
       error: (error) => {
+        this.isLoading = false;
         console.error('Error fetching arrivals:', error);
+        this.arrivalsDataSource = [];
       }
     });
   }
 
   onClear(): void {
     this.searchTerm = '';
+    this.arrivalsDataSource = [];
     this.searchEvent.emit('');
   }
 
   ngOnDestroy(): void {
     this.stationSubscription?.unsubscribe();
+  }
+
+  formatDelay(delayInSeconds: number): string {
+    if (!delayInSeconds) return 'On time';
+    const minutes = Math.floor(delayInSeconds / 60);
+    return `${minutes} min${minutes !== 1 ? 's' : ''} late`;
+  }
+
+  formatArrivalTime(timestamp: string): string {
+    if (!timestamp) return '--';
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 }
