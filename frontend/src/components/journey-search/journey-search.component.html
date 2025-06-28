@@ -59,31 +59,97 @@
   
   <div *ngIf="journeys && journeys.length > 0" class="results-container">
     <h3>Search Results</h3>
-    <mat-card *ngFor="let journey of journeys" class="result-card">
-      <mat-card-content>
-        <div class="journey-info">
-          <div class="journey-header">
-            <span class="price" *ngIf="journey.price?.amount">
-              {{ journey.price.amount | currency: 'EUR' }}
+    <div class="table-container">
+      <table mat-table [dataSource]="journeys" class="journey-table">
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>ID</th>
+          <td mat-cell *matCellDef="let element">{{element.id || 'N/A'}}</td>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td mat-cell *matCellDef="let element">{{element.name || 'N/A'}}</td>
+        </ng-container>
+
+        <!-- Destination Column -->
+        <ng-container matColumnDef="destination">
+          <th mat-header-cell *matHeaderCellDef>Destination</th>
+          <td mat-cell *matCellDef="let element">{{element.destination || 'N/A'}}</td>
+        </ng-container>
+
+        <!-- Direction Column -->
+        <ng-container matColumnDef="direction">
+          <th mat-header-cell *matHeaderCellDef>Direction</th>
+          <td mat-cell *matCellDef="let element">{{element.direction || 'N/A'}}</td>
+        </ng-container>
+
+        <!-- Line Column -->
+        <ng-container matColumnDef="line">
+          <th mat-header-cell *matHeaderCellDef>Line</th>
+          <td mat-cell *matCellDef="let element">{{element.line || 'N/A'}}</td>
+        </ng-container>
+
+        <!-- Arrival Column -->
+        <ng-container matColumnDef="arrival">
+          <th mat-header-cell *matHeaderCellDef>Arrival</th>
+          <td mat-cell *matCellDef="let element">
+            {{element.arrival ? (element.arrival | date:'shortTime') : 'N/A'}}
+          </td>
+        </ng-container>
+
+        <!-- Departure Column -->
+        <ng-container matColumnDef="departure">
+          <th mat-header-cell *matHeaderCellDef>Departure</th>
+          <td mat-cell *matCellDef="let element">
+            {{element.departure ? (element.departure | date:'shortTime') : 'N/A'}}
+          </td>
+        </ng-container>
+
+        <!-- Arrival Delay Column -->
+        <ng-container matColumnDef="arrivalDelay">
+          <th mat-header-cell *matHeaderCellDef>Arrival Delay</th>
+          <td mat-cell *matCellDef="let element">
+            {{element.arrivalDelay !== null && element.arrivalDelay !== undefined ? (element.arrivalDelay + ' min') : '-'}}
+          </td>
+        </ng-container>
+
+        <!-- Arrival Platform Column -->
+        <ng-container matColumnDef="arrivalPlatform">
+          <th mat-header-cell *matHeaderCellDef>Arrival Platform</th>
+          <td mat-cell *matCellDef="let element">
+            <span class="platform" *ngIf="element.arrivalPlatform">
+              {{element.arrivalPlatform}}
             </span>
-          </div>
-          
-          <div class="journey-details">
-            <div class="detail-row">
-              <mat-icon>location_on</mat-icon>
-              <span>From: {{ journey.from }}</span>
-            </div>
-            <div class="detail-row">
-              <mat-icon>location_on</mat-icon>
-              <span>To: {{ journey.to }}</span>
-            </div>
-            <div class="detail-row" *ngIf="journey.departure">
-              <mat-icon>schedule</mat-icon>
-              <span>Departs: {{ journey.departure | date:'medium' }}</span>
-            </div>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
+            <span *ngIf="!element.arrivalPlatform">-</span>
+          </td>
+        </ng-container>
+
+        <!-- Departure Delay Column -->
+        <ng-container matColumnDef="departureDelay">
+          <th mat-header-cell *matHeaderCellDef>Departure Delay</th>
+          <td mat-cell *matCellDef="let element">
+            {{element.departureDelay !== null && element.departureDelay !== undefined ? (element.departureDelay + ' min') : '-'}}
+          </td>
+        </ng-container>
+
+        <!-- Departure Platform Column -->
+        <ng-container matColumnDef="departurePlatform">
+          <th mat-header-cell *matHeaderCellDef>Departure Platform</th>
+          <td mat-cell *matCellDef="let element">
+            <span class="platform" *ngIf="element.departurePlatform">
+              {{element.departurePlatform}}
+            </span>
+            <span *ngIf="!element.departurePlatform">-</span>
+          </td>
+        </ng-container>
+
+
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
   </div>
 </div>

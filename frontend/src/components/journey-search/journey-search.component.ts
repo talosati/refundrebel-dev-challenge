@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTableModule } from '@angular/material/table';
 
 @Component({
   selector: 'app-journey-search',
@@ -23,7 +24,8 @@ import { MatIconModule } from '@angular/material/icon';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatIconModule
+    MatIconModule,
+    MatTableModule
   ],
   templateUrl: './journey-search.component.html',
   styleUrls: ['./journey-search.component.scss']
@@ -34,6 +36,20 @@ export class JourneySearchComponent implements OnDestroy {
   journeys: any[] = [];
   isLoading = false;
   error: string | null = null;
+  
+  displayedColumns: string[] = [
+    "id",
+    "name",
+    "destination",
+    "direction",
+    "line",
+    "arrival",
+    "departure",
+    "arrivalDelay",
+    "arrivalPlatform",
+    "departureDelay",
+    "departurePlatform"
+  ];
 
   private journeySubscription?: Subscription;
 
@@ -67,12 +83,11 @@ export class JourneySearchComponent implements OnDestroy {
       departure: new Date(this.searchForm.value.departure).toISOString()
     };
 
-
     this.journeySubscription?.unsubscribe();
 
     this.journeySubscription = this.journeyService.getJourneys(params).subscribe({
       next: (response: any) => {
-        this.journeys = response.journeys || [];
+        this.journeys = response.data || [];
         this.isLoading = false;
         if (this.journeys.length === 0) {
           this.snackBar.open('No journeys found for the selected criteria', 'Close', {
