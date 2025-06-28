@@ -24,4 +24,13 @@ export class StationService {
   getStations(): Observable<Station[]> {
     return this.http.get<Station[]>(this.apiUrl);
   }
+
+  /**
+   * Get arrivals for a specific station
+   * @param stationId - The ID of the station
+   * @returns Observable with the arrivals data
+   */
+  getArrivals(stationId: string | number): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/arrivals/station/${stationId}`);
+  }
 }

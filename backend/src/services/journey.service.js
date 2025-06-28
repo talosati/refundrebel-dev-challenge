@@ -23,17 +23,13 @@ class JourneyService {
         }
       });
 
-      const validProducts = new Set(['national', 'nationalExpress', 'regional', 'regionalExpress']);
-      
       const filteredJourneys = (response.data.journeys || [])
         .filter(journey => {
           const origin = journey.legs[0]?.origin || {};
           return (
             origin.type === 'station' && 
             origin.products && 
-            Object.entries(origin.products).some(([product]) => 
-              validProducts.has(product)
-            )
+            (origin.products.national || origin.products.nationalExpress || origin.products.regional || origin.products.regionalExpress)
           );
         });
 

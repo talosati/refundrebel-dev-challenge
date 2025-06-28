@@ -52,7 +52,6 @@ class Journey {
         .filter(journey => 
           journey.name !== journey.destination && 
           !!journey.line && 
-          !journey.line.startsWith('S ') && 
           !!journey.arrival && 
           !!journey.departure
         )

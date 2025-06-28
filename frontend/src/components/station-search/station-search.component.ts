@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, OnInit, OnDestroy, Inject, InjectionToken } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
 import { Subscription, Observable, of } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -9,7 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Station, StationService } from '../../services/station.service';
 
 @Component({
@@ -25,7 +25,8 @@ import { Station, StationService } from '../../services/station.service';
     MatButtonModule,
     MatAutocompleteModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    HttpClientModule
   ],
   providers: [
     HttpClient,
@@ -36,6 +37,7 @@ import { Station, StationService } from '../../services/station.service';
 })
 export class StationSearchComponent implements OnInit, OnDestroy {
   @Output() searchEvent = new EventEmitter<string>();
+  @Output() arrivalsLoaded = new EventEmitter<any[]>();
   searchTerm: string = '';
   stations: Station[] = [];
   filteredStations: Observable<Station[]> = of([]);
@@ -97,6 +99,8 @@ export class StationSearchComponent implements OnInit, OnDestroy {
     this.searchEvent.emit(selectedStation.id.toString());
   }
 
+
+
   onSearch(): void {
     if (this.searchTerm.trim()) {
       const searchTerm = this.searchTerm.trim().toLowerCase();
@@ -106,12 +110,29 @@ export class StationSearchComponent implements OnInit, OnDestroy {
       
       if (foundStation) {
         console.log(`Station ID for "${foundStation.name}":`, foundStation.id);
+        this.getArrivals(foundStation.id);
       } else {
         console.log(`No station found with name: "${this.searchTerm.trim()}"`);
       }
       
       this.searchEvent.emit(this.searchTerm.trim());
     }
+  }
+
+  private getArrivals(stationId: string | number): void {
+    this.stationService.getArrivals(stationId).subscribe({
+      next: (response: any) => {
+        if (response.success) {
+          console.log('Arrivals data:', response.data);
+          this.arrivalsLoaded.emit(response.data);
+        } else {
+          console.error('Failed to load arrivals:', response.message);
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching arrivals:', error);
+      }
+    });
   }
 
   onClear(): void {
