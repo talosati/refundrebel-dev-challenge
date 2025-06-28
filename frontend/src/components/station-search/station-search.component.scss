@@ -1,5 +1,5 @@
 .station-search {
-  max-width: 800px;
+  max-width: 95%;
   margin: 2rem auto;
   padding: 0 1rem;
 }
@@ -29,7 +29,6 @@
 .search-form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
   
   .mat-mdc-form-field-disabled {
     .mdc-text-field {
