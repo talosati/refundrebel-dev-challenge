@@ -1,0 +1,32 @@
+<div class="station-search">
+  <mat-card class="search-card">
+    <mat-card-header>
+      <mat-card-title>Search for Stations</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="search-form">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Station Name or ID</mat-label>
+          <input 
+            matInput 
+            type="text" 
+            [(ngModel)]="searchTerm"
+            name="searchTerm"
+            placeholder="e.g., Berlin or 8010330">
+        </mat-form-field>
+        
+        <div class="button-container">
+          <button 
+            mat-raised-button 
+            color="primary" 
+            type="button"
+            (click)="onSearch()"
+            class="search-button">
+            <span>Search Station</span>
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

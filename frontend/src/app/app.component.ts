@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { JourneySearchComponent } from '../components/journey-search/journey-search.component';
+import { StationSearchComponent } from '../components/station-search/station-search.component';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,8 @@ import { JourneySearchComponent } from '../components/journey-search/journey-sea
     CommonModule,
     RouterOutlet,
     MatToolbarModule,
-    JourneySearchComponent
+    JourneySearchComponent,
+    StationSearchComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
