@@ -14,11 +14,18 @@ const validateJourneyRequest = (req, res, next) => {
         });
     }
 
-    const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
+    const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:?\d{2})?$/;
     if (!dateRegex.test(departure)) {
         return res.status(400).json({
             success: false,
-            error: 'Invalid departure format. Please use ISO 8601 format (e.g., 2025-06-28T10:00:00)'
+            error: 'Invalid departure format. Please use ISO 8601 format (e.g., 2025-06-28T10:00:00 or 2025-06-28T10:00:00.000Z)'
+        });
+    }
+    
+    if (isNaN(new Date(departure).getTime())) {
+        return res.status(400).json({
+            success: false,
+            error: 'Invalid date provided'
         });
     }
 
