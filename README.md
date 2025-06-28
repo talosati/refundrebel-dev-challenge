@@ -71,6 +71,12 @@ To stop and remove all containers, networks, and volumes:
 docker compose down -v
 ```
 
+To clean up Docker cache and free up disk space (removes unused containers, networks, images, and build cache):
+```bash
+docker system prune -a --volumes
+```
+⚠️ **Warning**: This will remove all unused Docker resources.
+
 ## Project Structure
 
 ```
