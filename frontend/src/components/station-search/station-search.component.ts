@@ -12,8 +12,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, MatSort } from '@angular/material/sort';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Station, StationService } from '../../services/station.service';
+import { DateTimeFormatPipe } from '../../pipes';
 
 @Component({
   selector: 'app-station-search',
@@ -32,7 +33,7 @@ import { Station, StationService } from '../../services/station.service';
     MatTableModule,
     MatSortModule,
     MatPaginatorModule,
-    HttpClientModule
+    DateTimeFormatPipe
   ],
   providers: [
     HttpClient,
@@ -50,10 +51,10 @@ export class StationSearchComponent implements OnInit, OnDestroy {
   searchTerm: string = '';
   stations: Station[] = [];
   filteredStations: Observable<Station[]> = of([]);
+  selectedStation: Station | null = null;
   private stationSubscription?: Subscription;
   stationsLoaded = false;
   
-  // Table properties
   displayedColumns: string[] = ['station', 'line', 'arrival', 'delay', 'platform'];
   arrivalsDataSource: any[] = [];
   isLoading = false;
@@ -113,8 +114,6 @@ export class StationSearchComponent implements OnInit, OnDestroy {
     this.searchEvent.emit(selectedStation.id.toString());
   }
 
-
-
   onSearch(): void {
     if (this.searchTerm.trim()) {
       const searchTerm = this.searchTerm.trim().toLowerCase();
@@ -123,10 +122,10 @@ export class StationSearchComponent implements OnInit, OnDestroy {
       );
       
       if (foundStation) {
-        console.log(`Station ID for "${foundStation.name}":`, foundStation.id);
+        this.selectedStation = foundStation;
         this.getArrivals(foundStation.id);
       } else {
-        console.log(`No station found with name: "${this.searchTerm.trim()}"`);
+        this.selectedStation = null;
       }
       
       this.searchEvent.emit(this.searchTerm.trim());
@@ -139,11 +138,9 @@ export class StationSearchComponent implements OnInit, OnDestroy {
       next: (response: any) => {
         this.isLoading = false;
         if (response.success) {
-          console.log('Arrivals data:', response.data);
           this.arrivalsDataSource = response.data || [];
           this.arrivalsLoaded.emit(response.data);
         } else {
-          console.error('Failed to load arrivals:', response.message);
           this.arrivalsDataSource = [];
         }
       },
@@ -171,9 +168,5 @@ export class StationSearchComponent implements OnInit, OnDestroy {
     return `${minutes} min${minutes !== 1 ? 's' : ''} late`;
   }
 
-  formatArrivalTime(timestamp: string): string {
-    if (!timestamp) return '--';
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
+
 }

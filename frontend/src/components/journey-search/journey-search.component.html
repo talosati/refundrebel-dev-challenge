@@ -95,7 +95,7 @@
         <ng-container matColumnDef="arrival">
           <th mat-header-cell *matHeaderCellDef>Arrival</th>
           <td mat-cell *matCellDef="let element">
-            {{element.arrival ? (element.arrival | date:'shortTime') : 'N/A'}}
+            {{element.arrival | dateTimeFormat}}
           </td>
         </ng-container>
 
@@ -103,7 +103,7 @@
         <ng-container matColumnDef="departure">
           <th mat-header-cell *matHeaderCellDef>Departure</th>
           <td mat-cell *matCellDef="let element">
-            {{element.departure ? (element.departure | date:'shortTime') : 'N/A'}}
+            {{element.departure | dateTimeFormat}}
           </td>
         </ng-container>
 

@@ -11,6 +11,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
+import { DateTimeFormatPipe } from '../../pipes';
 
 @Component({
   selector: 'app-journey-search',
@@ -25,7 +26,8 @@ import { MatTableModule } from '@angular/material/table';
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatIconModule,
-    MatTableModule
+    MatTableModule,
+    DateTimeFormatPipe
   ],
   templateUrl: './journey-search.component.html',
   styleUrls: ['./journey-search.component.scss']
