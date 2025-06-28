@@ -8,6 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const journeyRoutes = require('./routes/journey.routes');
+const stationRoutes = require('./routes/station.routes');
 
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:4200',
@@ -21,6 +22,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/journeys', journeyRoutes);
+app.use('/api/stations', stationRoutes);
 
 mongoose
   .connect(process.env.MONGODB_URI || 'mongodb://db:27017/appdb', {
