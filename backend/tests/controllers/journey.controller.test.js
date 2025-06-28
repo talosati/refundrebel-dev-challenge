@@ -23,7 +23,27 @@ describe('Journey Controller', () => {
     const mockResponse = {
       data: {
         journeys: [
-          { id: 1, departure: '2025-06-28T10:00:00', arrival: '2025-06-28T12:00:00' }
+          {
+            legs: [
+              {
+                origin: {
+                  id: '123',
+                  name: 'Berlin Hbf',
+                  type: 'station',
+                  products: { national: true }
+                },
+                destination: { name: 'Hamburg Hbf' },
+                direction: 'Hamburg Hbf',
+                line: { name: 'ICE 123' },
+                arrival: '2025-06-28T12:00:00+02:00',
+                departure: '2025-06-28T10:00:00+02:00',
+                arrivalDelay: 300,
+                departureDelay: 0,
+                arrivalPlatform: '5',
+                departurePlatform: '8'
+              }
+            ]
+          }
         ]
       }
     };
@@ -33,7 +53,23 @@ describe('Journey Controller', () => {
     await journeyController.getJourneys(req, res);
     
     expect(res.statusCode).toBe(200);
-    expect(JSON.parse(res._getData())).toEqual(mockResponse.data);
+    const responseData = JSON.parse(res._getData());
+    expect(responseData).toHaveProperty('success', true);
+    expect(responseData.data).toEqual([
+      {
+        id: '123',
+        name: 'Berlin Hbf',
+        destination: 'Hamburg Hbf',
+        direction: 'Hamburg Hbf',
+        line: 'ICE 123',
+        arrival: '2025-06-28T12:00:00+02:00',
+        departure: '2025-06-28T10:00:00+02:00',
+        arrivalDelay: 5,
+        departureDelay: 0,
+        arrivalPlatform: '5',
+        departurePlatform: '8'
+      }
+    ]);
     expect(axios.get).toHaveBeenCalledWith(
       expect.stringContaining('/journeys'),
       expect.objectContaining({
@@ -88,6 +124,103 @@ describe('Journey Controller', () => {
     expect(res.statusCode).toBe(500);
     const responseData = JSON.parse(res._getData());
     expect(responseData.success).toBe(false);
-    expect(responseData.error).toContain('setting up request');
+    expect(responseData.error).toContain('Request setup failed');
+  });
+
+  it('should handle 401 unauthorized responses', async () => {
+    const errorResponse = {
+      response: {
+        status: 401,
+        data: { message: 'Unauthorized' }
+      }
+    };
+    
+    axios.get.mockRejectedValue(errorResponse);
+    
+    await journeyController.getJourneys(req, res);
+    
+    expect(res.statusCode).toBe(401);
+    const responseData = JSON.parse(res._getData());
+    expect(responseData.success).toBe(false);
+    expect(responseData.error).toContain('Unauthorized');
+  });
+
+  it('should handle 403 forbidden responses', async () => {
+    const errorResponse = {
+      response: {
+        status: 403,
+        data: { message: 'Forbidden' }
+      }
+    };
+    
+    axios.get.mockRejectedValue(errorResponse);
+    
+    await journeyController.getJourneys(req, res);
+    
+    expect(res.statusCode).toBe(403);
+    const responseData = JSON.parse(res._getData());
+    expect(responseData.success).toBe(false);
+    expect(responseData.error).toContain('Forbidden');
+  });
+
+  it('should handle 422 validation errors', async () => {
+    const errorResponse = {
+      response: {
+        status: 422,
+        data: { 
+          message: 'Validation failed',
+          details: ['Invalid departure time']
+        }
+      }
+    };
+    
+    axios.get.mockRejectedValue(errorResponse);
+    
+    await journeyController.getJourneys(req, res);
+    
+    expect(res.statusCode).toBe(422);
+    const responseData = JSON.parse(res._getData());
+    expect(responseData.success).toBe(false);
+    expect(responseData.error).toContain('Validation failed');
+    expect(responseData.details).toBeDefined();
+  });
+
+  it('should handle invalid date format in response', async () => {
+    const mockResponse = {
+      data: {
+        journeys: [
+          {
+            legs: [
+              {
+                origin: {
+                  id: '123',
+                  name: 'Berlin Hbf',
+                  type: 'station',
+                  products: { national: true }
+                },
+                destination: { name: 'Hamburg Hbf' },
+                direction: 'Hamburg Hbf',
+                line: { name: 'ICE 123' },
+                arrival: '2025-06-28T12:00:00+02:00',
+                departure: 'invalid-date',
+                arrivalDelay: 300,
+                departureDelay: 0,
+                arrivalPlatform: '5',
+                departurePlatform: '8'
+              }
+            ]
+          }
+        ]
+      }
+    };
+    
+    axios.get.mockResolvedValue(mockResponse);
+    
+    await journeyController.getJourneys(req, res);
+    
+    expect(res.statusCode).toBe(200);
+    const responseData = JSON.parse(res._getData());
+    expect(responseData.success).toBe(true);
+    expect(responseData.data[0].departure).toBe('invalid-date');
   });
 });
