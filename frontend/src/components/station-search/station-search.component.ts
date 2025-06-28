@@ -99,7 +99,17 @@ export class StationSearchComponent implements OnInit, OnDestroy {
 
   onSearch(): void {
     if (this.searchTerm.trim()) {
-      console.log("Search term:", this.searchTerm.trim());
+      const searchTerm = this.searchTerm.trim().toLowerCase();
+      const foundStation = this.stations.find(station => 
+        station.name.toLowerCase() === searchTerm
+      );
+      
+      if (foundStation) {
+        console.log(`Station ID for "${foundStation.name}":`, foundStation.id);
+      } else {
+        console.log(`No station found with name: "${this.searchTerm.trim()}"`);
+      }
+      
       this.searchEvent.emit(this.searchTerm.trim());
     }
   }
