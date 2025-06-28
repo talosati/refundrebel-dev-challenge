@@ -9,6 +9,7 @@ This is a full-stack application with a frontend built using Angular and a backe
 - TypeScript
 - RxJS
 - Angular CLI
+- Angular Material (Material Design)
 
 ### Backend
 - Node.js 20 (with Alpine Linux)
@@ -17,6 +18,10 @@ This is a full-stack application with a frontend built using Angular and a backe
 - CORS for cross-origin requests
 - Morgan for HTTP request logging
 - dotenv for environment variables
+
+### DB-Vendo Custom Client
+
+The `db-vendo-custom` directory contains a custom JavaScript client for interacting with Deutsche Bahn's public transport APIs. This client is running in a separate Docker container and our backend service communicates with it through axios to fetch journey information and other public transport data.
 
 ### Development Tools
 - Docker & Docker Compose
@@ -42,12 +47,11 @@ This is a full-stack application with a frontend built using Angular and a backe
    ```bash
    docker compose up --build
    ```
-   This will build and start all the services (frontend, backend, and MongoDB).
+   This will build and start all the services (frontend, backend, MongoDB, and DB-Vendo Client).
 
 3. Access the application:
    - Frontend: http://localhost:4200
    - Backend API: http://localhost:3000
-   - MongoDB: localhost:27017
 
 ### Development Workflow
 
@@ -73,6 +77,7 @@ docker compose down -v
 .
 ├── backend/           # Node.js/Express backend
 ├── frontend/          # Angular frontend
+├── db-vendo-custom/   # Custom JavaScript client for Deutsche Bahn APIs
 ├── docker-compose.yml # Docker Compose configuration
 └── README.md          # This file
 ```
