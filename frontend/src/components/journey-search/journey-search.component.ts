@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { JourneyService, JourneyParams } from '../../services/journey.service';
@@ -28,11 +29,13 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrls: ['./journey-search.component.scss']
 })
 
-export class JourneySearchComponent {
+export class JourneySearchComponent implements OnDestroy {
   searchForm: FormGroup;
   journeys: any[] = [];
   isLoading = false;
   error: string | null = null;
+
+  private journeySubscription?: Subscription;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -64,7 +67,10 @@ export class JourneySearchComponent {
       departure: new Date(this.searchForm.value.departure).toISOString()
     };
 
-    this.journeyService.getJourneys(params).subscribe({
+
+    this.journeySubscription?.unsubscribe();
+
+    this.journeySubscription = this.journeyService.getJourneys(params).subscribe({
       next: (response: any) => {
         this.journeys = response.journeys || [];
         this.isLoading = false;
@@ -85,5 +91,9 @@ export class JourneySearchComponent {
         });
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.journeySubscription?.unsubscribe();
   }
 }

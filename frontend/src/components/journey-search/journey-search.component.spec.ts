@@ -58,4 +58,23 @@ describe('JourneySearchComponent', () => {
     expect(component.error).toBe('Failed to fetch journeys. Please try again.');
     expect(component.isLoading).toBeFalse();
   });
+
+  it('should unsubscribe from journey subscription on destroy', () => {
+    const mockSubscription = jasmine.createSpyObj('Subscription', ['unsubscribe']);
+    
+    journeyServiceSpy.getJourneys.and.returnValue({
+      subscribe: () => mockSubscription
+    } as any);
+    
+    component.searchForm.setValue({
+      from: 'A',
+      to: 'B',
+      departure: new Date().toISOString()
+    });
+    
+    component.onSubmit();
+    component.ngOnDestroy();
+    
+    expect(mockSubscription.unsubscribe).toHaveBeenCalled();
+  });
 });
