@@ -242,7 +242,7 @@
         <p>Loading arrivals and departures data...</p>
       </div>
       
-      <div class="no-results" *ngIf="!isLoading && searchTerm && (arrivalsDataSource.length === 0 && departuresDataSource.length === 0)">
+      <div class="no-results" *ngIf="!isLoading && hasSearched && (arrivalsDataSource.length === 0 && departuresDataSource.length === 0)">
         <mat-icon>train</mat-icon>
         <p>No arrivals or departures found for this station</p>
       </div>

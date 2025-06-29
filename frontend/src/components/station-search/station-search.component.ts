@@ -62,6 +62,7 @@ export class StationSearchComponent implements OnInit, OnDestroy {
   arrivalsDataSource: any[] = [];
   departuresDataSource: any[] = [];
   isLoading = false;
+  hasSearched = false;
 
   getDelayClass = getDelayClass;
 
@@ -122,6 +123,7 @@ export class StationSearchComponent implements OnInit, OnDestroy {
 
   onSearch(): void {
     if (this.searchTerm.trim()) {
+      this.hasSearched = true;
       const searchTerm = this.searchTerm.trim().toLowerCase();
       const foundStation = this.stations.find(station => 
         station.name.toLowerCase() === searchTerm
@@ -132,6 +134,8 @@ export class StationSearchComponent implements OnInit, OnDestroy {
         this.getArrivalsAndDepartures(foundStation.id);
       } else {
         this.selectedStation = null;
+        this.arrivalsDataSource = [];
+        this.departuresDataSource = [];
       }
       
       this.searchEvent.emit(this.searchTerm.trim());
@@ -144,11 +148,8 @@ export class StationSearchComponent implements OnInit, OnDestroy {
       next: (response: any) => {
         if (response) {
           this.isLoading = false;
-          console.log("response", response);
           this.arrivalsDataSource = response.arrivals;
           this.departuresDataSource = response.departures;
-          console.log("this.arrivalsDataSource", this.arrivalsDataSource)
-          console.log("this.departuresDataSource", this.departuresDataSource)
           this.arrivalsLoaded.emit(response);
         } else {
           this.arrivalsDataSource = [];
@@ -168,6 +169,8 @@ export class StationSearchComponent implements OnInit, OnDestroy {
     this.searchTerm = '';
     this.arrivalsDataSource = [];
     this.departuresDataSource = [];
+    this.hasSearched = false;
+    this.selectedStation = null;
     this.searchEvent.emit('');
   }
 
