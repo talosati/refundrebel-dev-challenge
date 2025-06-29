@@ -47,17 +47,19 @@ export class JourneySearchComponent implements OnDestroy {
     "destination",
     "direction",
     "line",
-    "arrival",
     "departure",
-    "arrivalDelay",
-    "arrivalPlatform",
     "departureDelay",
-    "departurePlatform"
+    "departurePlatform",
+    "arrival",
+    "arrivalDelay",
+    "arrivalPlatform"
   ];
 
   private journeySubscription?: Subscription;
 
   getDelayClass = getDelayClass;
+
+  hasSearched = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -95,6 +97,7 @@ export class JourneySearchComponent implements OnDestroy {
       next: (response: any) => {
         this.journeys = response.data || [];
         this.isLoading = false;
+        this.hasSearched = true;
       },
       error: (err: any) => {
         console.error('Error fetching journeys:', err);
