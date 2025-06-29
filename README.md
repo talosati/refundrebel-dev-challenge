@@ -56,6 +56,7 @@ This is a full-stack application with a frontend built using Angular and a backe
    - Frontend: http://localhost:4200
    - Backend API: http://localhost:3000
    - DB-Vendo Client: http://localhost:3001
+   - **API Documentation (Swagger UI)**: http://localhost:3000/api-docs
 
 ### Development Workflow
 
@@ -90,3 +91,19 @@ docker system prune -a --volumes
 ├── docker-compose.yml # Docker Compose configuration
 └── README.md          # This file
 ```
+
+## API Documentation
+
+The application includes interactive API documentation powered by Swagger UI. You can access it at:
+
+```
+http://localhost:3000/api-docs
+```
+
+The Swagger documentation provides:
+- Interactive API explorer
+- Detailed endpoint descriptions
+- Request/response schemas
+- The ability to test API endpoints directly from the browser
+
+To update the API documentation, modify the JSDoc comments in the route files or update the `swaggerOptions` in `backend/src/index.js`. The documentation will be automatically regenerated when you restart the backend server.

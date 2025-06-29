@@ -2,6 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const swaggerJsdoc = require('swagger-jsdoc');
 require('dotenv').config();
 
 const { createClient } = require('db-vendo-client');
@@ -16,6 +19,64 @@ const PORT = process.env.PORT || 3000;
 const journeyRoutes = require('./routes/journey.routes');
 const stationRoutes = require('./routes/station.routes');
 const arrivalAndDepartureRoutes = require('./routes/arrivalAndDeparture.routes');
+
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Refund Rebel API',
+      version: '1.0.0',
+      description: 'API documentation for Refund Rebel application',
+    },
+    servers: [
+      {
+        url: `http://localhost:${PORT}`,
+      },
+    ],
+    components: {
+      schemas: {
+        Station: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            name: { type: 'string' },
+            address: { type: 'string' },
+          },
+        },
+        Journey: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            name: { type: 'string' },
+            destination: { type: 'string' },
+            direction: { type: 'string' },
+            line: { type: 'string' },
+            arrival: { type: 'string', format: 'date-time' },
+            departure: { type: 'string', format: 'date-time' },
+            arrivalDelay: { type: 'integer', description: 'Delay in minutes' },
+            arrivalPlatform: { type: 'string' },
+            departureDelay: { type: 'integer', description: 'Delay in minutes' },
+            departurePlatform: { type: 'string' },
+          },
+        },
+        ArrivalDeparture: {
+          type: 'object',
+          properties: {
+            station: { type: 'string' },
+            line: { type: 'string' },
+            when: { type: 'string', format: 'date-time' },
+            delay: { type: 'integer', description: 'Delay in minutes' },
+            platform: { type: 'string' }
+          },
+        },
+      },
+    },
+  },
+  apis: ['./src/routes/*.js'],
+};
+
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs, { explorer: true }));
 
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:4200',
