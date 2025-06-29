@@ -116,29 +116,32 @@ export class StationSearchComponent implements OnInit, OnDestroy {
     return station && station.name ? station.name : '';
   }
 
-  onOptionSelected(selectedStation: Station): void {
-    this.searchTerm = selectedStation.name;
+  onOptionSelected(event: any): void {
+    const selectedStation: Station = event.option?.value ? event.option.value : event;
+    if (selectedStation && selectedStation.name) {
+      this.searchTerm = selectedStation.name;
     this.searchEvent.emit(selectedStation.id.toString());
+    }
   }
 
   onSearch(): void {
     if (this.searchTerm.trim()) {
-      this.hasSearched = true;
+    this.hasSearched = true;
       const searchTerm = this.searchTerm.trim().toLowerCase();
-      const foundStation = this.stations.find(station => 
+    const foundStation = this.stations.find(station => 
         station.name.toLowerCase() === searchTerm
-      );
-      
-      if (foundStation) {
-        this.selectedStation = foundStation;
-        this.getArrivalsAndDepartures(foundStation.id);
+    );
+
+    if (foundStation) {
+      this.selectedStation = foundStation;
+      this.getArrivalsAndDepartures(foundStation.id);
       } else {
         this.selectedStation = null;
         this.arrivalsDataSource = [];
         this.departuresDataSource = [];
-      }
-      
-      this.searchEvent.emit(this.searchTerm.trim());
+    }
+    
+    this.searchEvent.emit(this.searchTerm.trim());
     }
   }
 
