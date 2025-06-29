@@ -4,6 +4,115 @@
   padding: 0 1rem;
 }
 
+.departures-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+  
+  h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #3f51b5;
+  }
+}
+
+.delay-filters {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: nowrap;
+  
+  .delay-filter {
+    width: 140px;
+    margin-bottom: 0.5rem;
+    
+    .mat-mdc-text-field-wrapper {
+      padding: 0 12px;
+      background-color: white;
+      border-radius: 4px;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      
+      &:hover {
+        border-color: rgba(0, 0, 0, 0.3);
+      }
+      
+      &.mdc-text-field--focused {
+        border-color: #3f51b5;
+        box-shadow: 0 0 0 1px #3f51b5;
+      }
+    }
+    
+    .mat-mdc-form-field-infix {
+      min-height: 56px;
+      padding: 12px 0;
+    }
+    
+    input.mat-mdc-input-element {
+      font-size: 1rem;
+      padding: 0 8px;
+      color: rgba(0, 0, 0, 0.87);
+    }
+    
+    .mat-mdc-form-field-subscript-wrapper {
+      display: none;
+    }
+    
+    .mat-mdc-form-field-hint-wrapper {
+      padding: 0;
+    }
+    
+    .mat-mdc-form-field-hint {
+      font-size: 0.75rem;
+      margin-top: 4px;
+      color: rgba(0, 0, 0, 0.6);
+    }
+  }
+  
+  .clear-filters {
+    height: 56px;
+    margin-bottom: 1.85em;
+    padding: 0 16px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    
+    &:hover:not([disabled]) {
+      background-color: rgba(244, 67, 54, 0.04);
+      transform: translateY(-1px);
+    }
+    
+    &:active:not([disabled]) {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    &[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+/* Highlight delayed departures */
+.highlighted {
+  background-color: #fff8e1; /* Light yellow background for delayed departures */
+  
+  &:hover {
+    background-color: #ffecb3 !important; /* Slightly darker yellow on hover */
+  }
+}
+
+.no-results {
+  text-align: center;
+  padding: 1.5rem;
+  color: #757575;
+  font-style: italic;
+}
+
 .search-card {
   margin-bottom: 2rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -237,7 +346,30 @@
   }
 }
 
+/* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
+  .departures-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    
+    .delay-filters {
+      width: 100%;
+      flex-direction: column;
+      align-items: stretch;
+      
+      .delay-filter {
+        width: 100%;
+      }
+      
+      .clear-filters {
+        width: 100%;
+        margin: 0.5rem 0 0 0;
+      }
+    }
+  }
+  
+  
   .desktop-view {
     display: none !important;
   }
