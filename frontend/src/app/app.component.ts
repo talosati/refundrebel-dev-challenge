@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { JourneySearchComponent } from '../components/journey-search/journey-search.component';
 import { StationSearchComponent } from '../components/station-search/station-search.component';
@@ -10,7 +9,6 @@ import { StationSearchComponent } from '../components/station-search/station-sea
   standalone: true,
   imports: [
     CommonModule,
-    RouterOutlet,
     MatToolbarModule,
     JourneySearchComponent,
     StationSearchComponent
