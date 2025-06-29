@@ -1,4 +1,4 @@
-# RefundRebel Dev Challenge
+# refundrebel Dev Challenge
 
 This is a full-stack application with a frontend built using Angular and a backend built with Node.js/Express, running in Docker containers.
 

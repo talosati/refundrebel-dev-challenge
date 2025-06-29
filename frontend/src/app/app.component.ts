@@ -17,5 +17,5 @@ import { StationSearchComponent } from '../components/station-search/station-sea
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'RefundRebel';
+  title = 'refundrebel';
 }
