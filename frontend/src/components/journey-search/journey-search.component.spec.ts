@@ -72,14 +72,12 @@ describe('JourneySearchComponent', () => {
   it('should initialize form with default values', () => {
     expect(component.searchForm.get('from')?.value).toBe('8000105');
     expect(component.searchForm.get('to')?.value).toBe('8010330');
-    expect(component.searchForm.get('departure')).toBeTruthy();
   });
 
   it('should mark form as invalid when empty', () => {
     component.searchForm.setValue({
       from: '',
       to: '',
-      departure: ''
     });
     expect(component.searchForm.valid).toBeFalse();
   });
@@ -88,7 +86,6 @@ describe('JourneySearchComponent', () => {
     component.searchForm.setValue({
       from: '8000105',
       to: '8010330',
-      departure: new Date().toISOString()
     });
     expect(component.searchForm.valid).toBeTrue();
   });
@@ -101,7 +98,6 @@ describe('JourneySearchComponent', () => {
     component.searchForm.setValue({
       from: '8000105',
       to: '8010330',
-      departure: testDate.toISOString()
     });
     
     component.onSubmit();
@@ -109,7 +105,6 @@ describe('JourneySearchComponent', () => {
     expect(journeyServiceSpy.getJourneys).toHaveBeenCalledWith({
       from: '8000105',
       to: '8010330',
-      departure: testDate.toISOString()
     });
     expect(component.isLoading).toBeFalse();
     expect(component.journeys).toEqual([mockJourney]);
@@ -119,7 +114,6 @@ describe('JourneySearchComponent', () => {
     component.searchForm.setValue({
       from: '',
       to: '',
-      departure: ''
     });
     
     component.onSubmit();

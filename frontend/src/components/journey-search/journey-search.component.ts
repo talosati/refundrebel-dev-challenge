@@ -66,13 +66,9 @@ export class JourneySearchComponent implements OnDestroy {
     private journeyService: JourneyService,
     private snackBar: MatSnackBar
   ) {
-    const now = new Date();
-    const defaultDate = now.toISOString().slice(0, 16);
-    
     this.searchForm = this.formBuilder.group({
       from: ['8000105', Validators.required],
-      to: ['8010330', Validators.required],
-      departure: [defaultDate, Validators.required]
+      to: ['8010330', Validators.required]
     });
   }
 
@@ -87,8 +83,7 @@ export class JourneySearchComponent implements OnDestroy {
 
     const params: JourneyParams = {
       from: this.searchForm.value.from,
-      to: this.searchForm.value.to,
-      departure: new Date(this.searchForm.value.departure).toISOString()
+      to: this.searchForm.value.to
     };
 
     this.journeySubscription?.unsubscribe();

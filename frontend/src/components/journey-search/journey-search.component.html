@@ -26,15 +26,6 @@
             required>
         </mat-form-field>
         
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Departure</mat-label>
-          <input 
-            matInput 
-            type="datetime-local" 
-            formControlName="departure"
-            required>
-        </mat-form-field>
-        
         <div class="button-container">
           <button 
             mat-raised-button 
@@ -63,7 +54,7 @@
   </mat-card>
   
   <div *ngIf="journeys && journeys.length > 0" class="results-container">
-    <h3>Search Results</h3>
+    <h3>Journeys</h3>
     <div class="table-container">
       <table mat-table [dataSource]="journeys" class="journey-table">
         <ng-container matColumnDef="id">
@@ -150,7 +141,7 @@
   </div>
 
   <div *ngIf="journeys && journeys.length > 0" class="mobile-results">
-    <h3>Search Results</h3>
+    <h3>Journeys</h3>
     <div class="journey-cards">
       <div *ngFor="let journey of journeys" class="journey-card">
         <div class="card-row">

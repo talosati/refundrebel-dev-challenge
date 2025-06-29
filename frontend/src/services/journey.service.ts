@@ -6,7 +6,6 @@ import { environment } from '../environments/environment';
 export interface JourneyParams {
   from: string;
   to: string;
-  departure: string;
 }
 
 @Injectable({
@@ -25,8 +24,7 @@ export class JourneyService {
   getJourneys(params: JourneyParams): Observable<any> {
     const httpParams = new HttpParams()
       .set('from', params.from)
-      .set('to', params.to)
-      .set('departure', params.departure);
+      .set('to', params.to);
 
     return this.http.get(this.apiUrl, { params: httpParams });
   }

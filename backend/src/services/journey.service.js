@@ -10,27 +10,21 @@ class JourneyService {
    * @param {Object} params - Journey search parameters
    * @param {string} params.from - Origin station ID
    * @param {string} params.to - Destination station ID
-   * @param {string} params.departure - Departure time
    * @returns {Promise<Array>} - Array of processed journeys
    */
-  static async getJourneys({ from, to, departure }) {
+  static async getJourneys({ from, to }) {
     try {
       const response = await axios.get(`${DB_VENDO_BASE_URL}/journeys`, {
-        params: { from, to, departure },
+        params: { from, to },
         headers: {
           'Origin': FRONTEND_URL,
           'Accept': 'application/json',
         }
       });
-
-      const filteredJourneys = (response.data.journeys || [])
-        .filter(journey => {
-          const origin = journey.legs[0]?.origin || {};
-          return (
-            origin.type === 'station' && 
-            origin.products && 
-            (origin.products.national || origin.products.nationalExpress || origin.products.regional || origin.products.regionalExpress)
-          );
+      const filteredJourneys = response.data.journeys.filter(journey => {
+          const products = journey.legs[0].origin.products;
+          const unwantedProducts = ['suburban', 'subway', 'tram', 'bus', 'taxi', 'ferry'];
+          return unwantedProducts.every(product => products[product] === false);
         });
 
       return Journey.fromRawJourneys(filteredJourneys);
