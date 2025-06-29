@@ -61,37 +61,31 @@
     <h3>Search Results</h3>
     <div class="table-container">
       <table mat-table [dataSource]="journeys" class="journey-table">
-        <!-- ID Column -->
         <ng-container matColumnDef="id">
           <th mat-header-cell *matHeaderCellDef>ID</th>
           <td mat-cell *matCellDef="let element">{{element.id || 'N/A'}}</td>
         </ng-container>
 
-        <!-- Name Column -->
         <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <th mat-header-cell *matHeaderCellDef>From</th>
           <td mat-cell *matCellDef="let element">{{element.name || 'N/A'}}</td>
         </ng-container>
 
-        <!-- Destination Column -->
         <ng-container matColumnDef="destination">
           <th mat-header-cell *matHeaderCellDef>Destination</th>
           <td mat-cell *matCellDef="let element">{{element.destination || 'N/A'}}</td>
         </ng-container>
 
-        <!-- Direction Column -->
         <ng-container matColumnDef="direction">
           <th mat-header-cell *matHeaderCellDef>Direction</th>
           <td mat-cell *matCellDef="let element">{{element.direction || 'N/A'}}</td>
         </ng-container>
 
-        <!-- Line Column -->
         <ng-container matColumnDef="line">
           <th mat-header-cell *matHeaderCellDef>Line</th>
           <td mat-cell *matCellDef="let element">{{element.line || 'N/A'}}</td>
         </ng-container>
 
-        <!-- Arrival Column -->
         <ng-container matColumnDef="arrival">
           <th mat-header-cell *matHeaderCellDef>Arrival</th>
           <td mat-cell *matCellDef="let element">
@@ -99,7 +93,6 @@
           </td>
         </ng-container>
 
-        <!-- Departure Column -->
         <ng-container matColumnDef="departure">
           <th mat-header-cell *matHeaderCellDef>Departure</th>
           <td mat-cell *matCellDef="let element">
@@ -107,7 +100,6 @@
           </td>
         </ng-container>
 
-        <!-- Arrival Delay Column -->
         <ng-container matColumnDef="arrivalDelay">
           <th mat-header-cell *matHeaderCellDef>Arrival Delay</th>
           <td mat-cell *matCellDef="let element">
@@ -115,7 +107,6 @@
           </td>
         </ng-container>
 
-        <!-- Arrival Platform Column -->
         <ng-container matColumnDef="arrivalPlatform">
           <th mat-header-cell *matHeaderCellDef>Arrival Platform</th>
           <td mat-cell *matCellDef="let element">
@@ -126,7 +117,6 @@
           </td>
         </ng-container>
 
-        <!-- Departure Delay Column -->
         <ng-container matColumnDef="departureDelay">
           <th mat-header-cell *matHeaderCellDef>Departure Delay</th>
           <td mat-cell *matCellDef="let element">
@@ -134,7 +124,6 @@
           </td>
         </ng-container>
 
-        <!-- Departure Platform Column -->
         <ng-container matColumnDef="departurePlatform">
           <th mat-header-cell *matHeaderCellDef>Departure Platform</th>
           <td mat-cell *matCellDef="let element">
@@ -145,11 +134,55 @@
           </td>
         </ng-container>
 
-
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
+    </div>
+  </div>
+
+  <div *ngIf="journeys && journeys.length > 0" class="mobile-results">
+    <h3>Search Results</h3>
+    <div class="journey-cards">
+      <div *ngFor="let journey of journeys" class="journey-card">
+        <div class="card-row">
+          <span class="label">Line:</span>
+          <span class="value">{{journey.line || 'N/A'}}</span>
+        </div>
+        <div class="card-row">
+          <span class="label">Route:</span>
+          <span class="value route">
+            {{journey.name || 'N/A'}}
+            <span *ngIf="journey.departurePlatform" class="platform">
+              &nbsp;{{journey.departurePlatform}}
+            </span>
+            <mat-icon class="arrow-icon">arrow_forward</mat-icon>
+            {{journey.destination || 'N/A'}}
+            <span *ngIf="journey.arrivalPlatform" class="platform">
+              &nbsp;{{journey.arrivalPlatform}}
+            </span>
+          </span>
+        </div>
+        <div class="card-row">
+          <span class="label">Departure:</span>
+          <span class="value">
+            {{journey.departure | dateTimeFormat}}
+            <span *ngIf="journey.departureDelay !== null && journey.departureDelay !== undefined && journey.departureDelay > 0" class="delay">
+              +{{journey.departureDelay}} min
+            </span>
+            <mat-icon *ngIf="!journey.departureDelay || journey.departureDelay === 0" class="on-time">check_circle</mat-icon>
+          </span>
+        </div>
+        <div class="card-row">
+          <span class="label">Arrival:</span>
+          <span class="value">
+            {{journey.arrival | dateTimeFormat}}
+            <span *ngIf="journey.arrivalDelay !== null && journey.arrivalDelay !== undefined && journey.arrivalDelay > 0" class="delay">
+              +{{journey.arrivalDelay}} min
+            </span>
+            <mat-icon *ngIf="!journey.arrivalDelay || journey.arrivalDelay === 0" class="on-time">check_circle</mat-icon>
+          </span>
+        </div>
+      </div>
     </div>
   </div>
 </div>

@@ -55,26 +55,29 @@
         </div>
       </form>
       
-      <div class="arrivals-container" *ngIf="arrivalsDataSource.length > 0">
-        <div class="station-info" *ngIf="selectedStation">
-          <h3>Station Information</h3>
-          <div class="station-details">
-            <div class="station-detail">
-              <span class="detail-label">Station ID:</span>
-              <span class="detail-value">{{selectedStation.id}}</span>
-            </div>
-            <div class="station-detail">
-              <span class="detail-label">Name:</span>
-              <span class="detail-value">{{selectedStation.name}}</span>
-            </div>
-            <div class="station-detail" *ngIf="selectedStation.address">
-              <span class="detail-label">Address:</span>
-              <span class="detail-value">{{selectedStation.address}}</span>
-            </div>
+      <div class="station-info" *ngIf="selectedStation">
+        <h3>Station Information</h3>
+        <div class="station-details">
+          <div class="station-detail">
+            <span class="detail-label">Station ID:</span>
+            <span class="detail-value">{{selectedStation.id}}</span>
+          </div>
+          <div class="station-detail">
+            <span class="detail-label">Name:</span>
+            <span class="detail-value">{{selectedStation.name}}</span>
+          </div>
+          <div class="station-detail" *ngIf="selectedStation.address">
+            <span class="detail-label">Address:</span>
+            <span class="detail-value">{{selectedStation.address}}</span>
           </div>
         </div>
+      </div>
+
+      <div class="arrivals-container" *ngIf="arrivalsDataSource.length > 0">
         <h3>Arrivals</h3>
-        <div class="table-container">
+        
+        <!-- Desktop Table View -->
+        <div class="table-container desktop-view">
           <table mat-table [dataSource]="arrivalsDataSource" matSort class="arrivals-table">
               
             <ng-container matColumnDef="station">
@@ -107,27 +110,139 @@
               </td>
             </ng-container>
 
-            <ng-container matColumnDef="platform">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Platform</th>
+            <ng-container matColumnDef="arrivalPlatform">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Arrival Platform</th>
               <td mat-cell *matCellDef="let element">
                 <span class="platform-badge">{{element.platform || '--'}}</span>
               </td>
             </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr mat-header-row *matHeaderRowDef="displayedArrivalColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedArrivalColumns;"></tr>
           </table>
+        </div>
+        
+        <!-- Mobile Card View -->
+        <div class="mobile-view">
+          <div class="journey-cards">
+            <div *ngFor="let item of arrivalsDataSource" class="journey-card">
+              <div class="card-row">
+                <span class="card-label">Line:</span>
+                <span class="line-badge" [style.background]="item.lineColor || '#cccccc'">
+                  {{item.line || '--'}}
+                </span>
+              </div>
+              <div class="card-row">
+                <span class="card-label">From:</span>
+                <span class="card-value">{{item.station || '--'}}</span>
+              </div>
+              <div class="card-row">
+                <span class="card-label">Arrival:</span>
+                <span class="card-value" [class.delayed]="item.delay > 0" [class.on-time]="!item.delay">
+                  {{item.when | dateTimeFormat}}
+                  <span *ngIf="item.delay > 0" class="delay-indicator">
+                    +{{item.delay / 60}} min
+                  </span>
+                </span>
+              </div>
+              <div class="card-row" *ngIf="item.platform">
+                <span class="card-label">Platform:</span>
+                <span class="platform-badge">{{item.platform}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="departures-container" *ngIf="departuresDataSource.length > 0">
+        <h3>Departures</h3>
+        
+        <!-- Desktop Table View -->
+        <div class="table-container desktop-view">
+          <table mat-table [dataSource]="departuresDataSource" matSort class="departures-table">
+               
+            <ng-container matColumnDef="station">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Station</th>
+              <td mat-cell *matCellDef="let element">{{element.station || '--'}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="line">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Line</th>
+              <td mat-cell *matCellDef="let element">
+                <span class="line-badge" [style.background]="element.lineColor || '#cccccc'">
+                  {{element.line || '--'}}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="departure">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Departure</th>
+              <td mat-cell *matCellDef="let element">
+                {{element.when | dateTimeFormat}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="departureDelay">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Departure Delay</th>
+              <td mat-cell *matCellDef="let element" 
+                  [class.delayed]="element.delay > 0"
+                  [class.on-time]="!element.delay">
+                {{formatDelay(element.delay)}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="departurePlatform">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Departure Platform</th>
+              <td mat-cell *matCellDef="let element">
+                <span class="platform-badge">{{element.departurePlatform || element.platform || '--'}}</span>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedDepartureColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedDepartureColumns;"></tr>
+          </table>
+        </div>
+        
+        <!-- Mobile Card View -->
+        <div class="mobile-view">
+          <div class="journey-cards">
+            <div *ngFor="let item of departuresDataSource" class="journey-card">
+              <div class="card-row">
+                <span class="card-label">Line:</span>
+                <span class="line-badge" [style.background]="item.lineColor || '#cccccc'">
+                  {{item.line || '--'}}
+                </span>
+              </div>
+              <div class="card-row">
+                <span class="card-label">To:</span>
+                <span class="card-value">{{item.station || '--'}}</span>
+              </div>
+              <div class="card-row">
+                <span class="card-label">Departure:</span>
+                <span class="card-value" [class.delayed]="item.delay > 0" [class.on-time]="!item.delay">
+                  {{item.when | dateTimeFormat}}
+                  <span *ngIf="item.delay > 0" class="delay-indicator">
+                    +{{item.delay / 60}} min
+                  </span>
+                </span>
+              </div>
+              <div class="card-row" *ngIf="item.platform">
+                <span class="card-label">Platform:</span>
+                <span class="platform-badge">{{item.platform}}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       
       <div class="loading-spinner" *ngIf="isLoading">
         <mat-spinner diameter="40"></mat-spinner>
-        <p>Loading arrivals data...</p>
+        <p>Loading arrivals and departures data...</p>
       </div>
       
-      <div class="no-results" *ngIf="!isLoading && searchTerm && arrivalsDataSource.length === 0">
+      <div class="no-results" *ngIf="!isLoading && searchTerm && (arrivalsDataSource.length === 0 && departuresDataSource.length === 0)">
         <mat-icon>train</mat-icon>
-        <p>No arrivals found for this station</p>
+        <p>No arrivals or departures found for this station</p>
       </div>
     </mat-card-content>
   </mat-card>

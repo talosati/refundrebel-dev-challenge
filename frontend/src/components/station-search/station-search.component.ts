@@ -55,8 +55,10 @@ export class StationSearchComponent implements OnInit, OnDestroy {
   private stationSubscription?: Subscription;
   stationsLoaded = false;
   
-  displayedColumns: string[] = ['station', 'line', 'arrival', 'delay', 'platform'];
+  displayedArrivalColumns: string[] = ['station', 'line', 'arrival', 'delay', 'arrivalPlatform'];
+  displayedDepartureColumns: string[] = ['station', 'line', 'departure', 'departureDelay', 'departurePlatform'];
   arrivalsDataSource: any[] = [];
+  departuresDataSource: any[] = [];
   isLoading = false;
 
   constructor(private stationService: StationService) {}
@@ -123,7 +125,7 @@ export class StationSearchComponent implements OnInit, OnDestroy {
       
       if (foundStation) {
         this.selectedStation = foundStation;
-        this.getArrivals(foundStation.id);
+        this.getArrivalsAndDepartures(foundStation.id);
       } else {
         this.selectedStation = null;
       }
@@ -132,22 +134,28 @@ export class StationSearchComponent implements OnInit, OnDestroy {
     }
   }
 
-  private getArrivals(stationId: string | number): void {
+  private getArrivalsAndDepartures(stationId: string | number): void {
     this.isLoading = true;
-    this.stationService.getArrivals(stationId).subscribe({
+    this.stationService.getArrivalsAndDepartures(stationId).subscribe({
       next: (response: any) => {
-        this.isLoading = false;
-        if (response.success) {
-          this.arrivalsDataSource = response.data || [];
-          this.arrivalsLoaded.emit(response.data);
+        if (response) {
+          this.isLoading = false;
+          console.log("response", response);
+          this.arrivalsDataSource = response.arrivals;
+          this.departuresDataSource = response.departures;
+          console.log("this.arrivalsDataSource", this.arrivalsDataSource)
+          console.log("this.departuresDataSource", this.departuresDataSource)
+          this.arrivalsLoaded.emit(response);
         } else {
           this.arrivalsDataSource = [];
+          this.departuresDataSource = [];
         }
       },
       error: (error) => {
         this.isLoading = false;
         console.error('Error fetching arrivals:', error);
         this.arrivalsDataSource = [];
+        this.departuresDataSource = [];
       }
     });
   }
@@ -155,6 +163,7 @@ export class StationSearchComponent implements OnInit, OnDestroy {
   onClear(): void {
     this.searchTerm = '';
     this.arrivalsDataSource = [];
+    this.departuresDataSource = [];
     this.searchEvent.emit('');
   }
 
@@ -167,6 +176,4 @@ export class StationSearchComponent implements OnInit, OnDestroy {
     const minutes = Math.floor(delayInSeconds / 60);
     return `${minutes} min${minutes !== 1 ? 's' : ''} late`;
   }
-
-
 }

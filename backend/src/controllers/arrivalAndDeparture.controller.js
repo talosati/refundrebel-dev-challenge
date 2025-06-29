@@ -1,15 +1,13 @@
-const arrivalService = require('../services/arrival.service');
+const arrivalAndDepartureService = require('../services/arrivalAndDeparture.service');
 
-/**
- * Controller for handling arrival-related HTTP requests
- */
-class ArrivalController {
+
+class ArrivalAndDepartureController {
   /**
    * Get arrivals by station ID
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
    */
-  async getArrivalsByStationId(req, res) {
+  async getArrivalsAndDeparturesByStationId(req, res) {
     try {
       const { stationId } = req.params;
       
@@ -20,14 +18,11 @@ class ArrivalController {
         });
       }
 
-      const arrivals = await arrivalService.getArrivalsByStationId(stationId);
+      const arrivalsAndDepartures = await arrivalAndDepartureService.getArrivalsAndDeparturesByStationId(stationId);
       
-      return res.status(200).json({
-        success: true,
-        data: arrivals
-      });
+      return res.json(arrivalsAndDepartures);
     } catch (error) {
-      console.error('Error in getArrivalsByStationId:', error);
+      console.error('Error in getArrivalsAndDeparturesByStationId:', error);
       return res.status(500).json({
         success: false,
         message: error.message || 'Internal server error'
@@ -36,4 +31,4 @@ class ArrivalController {
   }
 }
 
-module.exports = new ArrivalController();
+module.exports = new ArrivalAndDepartureController();

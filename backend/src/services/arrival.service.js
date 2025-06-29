@@ -1,5 +1,5 @@
 const axios = require('axios');
-const Arrival = require('../models/arrival.model');
+const Arrival = require('../models/stationEvent.model');
 
 const DB_VENDO_BASE_URL = process.env.DB_VENDO_BASE_URL || 'http://localhost:3001';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:4200';

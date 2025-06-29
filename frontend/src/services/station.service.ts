@@ -26,11 +26,11 @@ export class StationService {
   }
 
   /**
-   * Get arrivals for a specific station
+   * Get arrivals and departures for a specific station
    * @param stationId - The ID of the station
-   * @returns Observable with the arrivals data
+   * @returns Observable with the arrivals and departures data
    */
-  getArrivals(stationId: string | number): Observable<any> {
-    return this.http.get(`${environment.apiUrl}/arrivals/station/${stationId}`);
+  getArrivalsAndDepartures(stationId: string | number): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/arrivalsAndDepartures/station/${stationId}`);
   }
 }
