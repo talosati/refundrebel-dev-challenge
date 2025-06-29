@@ -116,7 +116,7 @@ describe('StationSearchComponent', () => {
   });
 
   it('should initialize form controls', () => {
-    expect(component.filterForm).toBeTruthy();
+    expect(component.departureFilterForm).toBeTruthy();
     expect(component.arrivalFilterForm).toBeTruthy();
   });
 
@@ -150,7 +150,7 @@ describe('StationSearchComponent', () => {
     fixture.detectChanges();
 
     expect(component.stationsLoaded).toBeFalse();
-    expect(component.filterForm.get('searchTerm')?.disabled).toBeTrue();
+    expect(component.departureFilterForm.get('searchTerm')?.disabled).toBeTrue();
   });
 
   it('should filter stations based on input', (done) => {
@@ -177,8 +177,8 @@ describe('StationSearchComponent', () => {
     
     component.stations = [station];
     component.selectedStation = station;
-    component.filterForm.enable();
-    component.filterForm.patchValue({ searchTerm: 'Berlin Hbf' });
+    component.departureFilterForm.enable();
+    component.departureFilterForm.patchValue({ searchTerm: 'Berlin Hbf' });
     
     searchEmitSpy.calls.reset();
     
@@ -197,8 +197,8 @@ describe('StationSearchComponent', () => {
     
     component.stations = [station];
     component.selectedStation = station;
-    component.filterForm.enable();
-    component.filterForm.patchValue({ searchTerm: testTerm });
+    component.departureFilterForm.enable();
+    component.departureFilterForm.patchValue({ searchTerm: testTerm });
     
     searchEmitSpy.calls.reset();
     
@@ -260,12 +260,12 @@ describe('StationSearchComponent', () => {
     const event = { option: { value: station } };
     component.onOptionSelected(event);
     expect(component.selectedStation).toEqual(station);
-    expect(component.filterForm.get('searchTerm')?.value).toBe(station.name);
+    expect(component.departureFilterForm.get('searchTerm')?.value).toBe(station.name);
   });
 
   it('should handle search with invalid station', () => {
     component.stations = mockStations;
-    component.filterForm.patchValue({ searchTerm: 'Nonexistent Station' });
+    component.departureFilterForm.patchValue({ searchTerm: 'Nonexistent Station' });
 
     component.onSearch();
 
@@ -321,7 +321,7 @@ describe('StationSearchComponent', () => {
 
   it('should handle search with invalid station', () => {
     component.stations = mockStations;
-    component.filterForm.patchValue({ searchTerm: 'Nonexistent Station' });
+    component.departureFilterForm.patchValue({ searchTerm: 'Nonexistent Station' });
 
     component.onSearch();
 
