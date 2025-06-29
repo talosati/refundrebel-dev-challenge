@@ -24,13 +24,45 @@ const mockStations = [
 ];
 
 const mockArrivals = [
-  { id: 'a1', station: 'Hamburg Hbf', line: 'ICE 123', arrival: '2025-06-29T10:00:00Z', delay: 5, arrivalPlatform: '1' },
-  { id: 'a2', station: 'Hannover Hbf', line: 'ICE 456', arrival: '2025-06-29T11:00:00Z', delay: 0, arrivalPlatform: '2' }
+  { 
+    id: 'a1', 
+    station: 'Hamburg Hbf', 
+    line: 'ICE 123',
+    when: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+    delay: 5, 
+    platform: '1',
+    plannedWhen: new Date(Date.now() + 15 * 60 * 1000).toISOString()
+  },
+  { 
+    id: 'a2', 
+    station: 'Hannover Hbf', 
+    line: 'ICE 456',
+    when: new Date(Date.now() + 45 * 60 * 1000).toISOString(),
+    delay: 0, 
+    platform: '2',
+    plannedWhen: new Date(Date.now() + 45 * 60 * 1000).toISOString()
+  }
 ];
 
 const mockDepartures = [
-  { id: 'd1', station: 'Munich Hbf', line: 'ICE 789', departure: '2025-06-29T12:00:00Z', delay: 10, departurePlatform: '3' },
-  { id: 'd2', station: 'Cologne Hbf', line: 'ICE 101', departure: '2025-06-29T13:00:00Z', delay: 0, departurePlatform: '4' }
+  { 
+    id: 'd1', 
+    station: 'Munich Hbf', 
+    line: 'ICE 789',
+    when: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+    delay: 10, 
+    platform: '3',
+    plannedWhen: new Date(Date.now() + 20 * 60 * 1000).toISOString()
+  },
+  { 
+    id: 'd2', 
+    station: 'Cologne Hbf', 
+    line: 'ICE 101',
+    when: new Date(Date.now() + 90 * 60 * 1000).toISOString(),
+    delay: 0, 
+    platform: '4',
+    plannedWhen: new Date(Date.now() + 90 * 60 * 1000).toISOString()
+  }
 ];
 
 describe('StationSearchComponent', () => {
@@ -270,48 +302,206 @@ describe('StationSearchComponent', () => {
     component.onSearch();
 
     expect(component.selectedStation).toBeNull();
-    expect(component.arrivalsDataSource).toEqual([]);
-    expect(component.departuresDataSource).toEqual([]);
+    expect(component.arrivalsDataSource.length).toBe(0);
+    expect(component.departuresDataSource.length).toBe(0);
+    expect(component.filteredArrivals.length).toBe(0);
+    expect(component.filteredDepartures.length).toBe(0);
+  });
+
+  describe('Departure Time Filter', () => {
+    beforeEach(() => {
+      component.stations = mockStations;
+      component.selectedStation = mockStations[0];
+      
+      const now = new Date();
+      const in30min = new Date(now.getTime() + 30 * 60 * 1000);
+      const in90min = new Date(now.getTime() + 90 * 60 * 1000);
+      
+      component.departuresDataSource = [
+        { 
+          id: 'd1',
+          station: 'Berlin Hbf',
+          line: 'ICE 101',
+          when: in30min.toISOString(),
+          plannedWhen: in30min.toISOString(),
+          delay: 0,
+          platform: '1'
+        },
+        { 
+          id: 'd2',
+          station: 'Hamburg Hbf',
+          line: 'ICE 202',
+          when: in90min.toISOString(),
+          plannedWhen: new Date(in90min.getTime() - 10 * 60 * 1000).toISOString(),
+          delay: 10,
+          platform: '2'
+        }
+      ];
+      component.filteredDepartures = [...component.departuresDataSource];
+    });
+
+    it('should filter departures by maxDeparture time', () => {
+      component.departureFilterForm.patchValue({ 
+        maxDeparture: 60,
+        minDelay: '',
+        maxDelay: ''
+      });
+      
+      component.applyDepartureFilters();
+      
+      expect(component.filteredDepartures.length).toBe(1);
+      expect(component.filteredDepartures[0].id).toBe('d1');
+    });
+
+    it('should combine maxDeparture with delay filters', () => {
+      component.departureFilterForm.patchValue({ 
+        maxDeparture: 120,  
+        minDelay: '5',
+        maxDelay: ''
+      });
+      
+      component.applyDepartureFilters();
+      
+      expect(component.filteredDepartures.length).toBe(1);
+      expect(component.filteredDepartures[0].id).toBe('d2');
+      expect(component.filteredDepartures[0].delay).toBe(10);
+    });
+
+    it('should clear departure filters', () => {
+      component.departureFilterForm.patchValue({ 
+        maxDeparture: 30,
+        minDelay: '5'
+      });
+      
+      component.onClearDepartureFilters();
+      
+      expect(component.departureFilterForm.get('maxDeparture')?.value).toBe('');
+      expect(component.departureFilterForm.get('minDelay')?.value).toBe('');
+      
+      expect(component.filteredDepartures.length).toBe(2);
+    });
+  });
+
+  describe('Arrival Time Filter', () => {
+    beforeEach(() => {
+      component.stations = mockStations;
+      component.selectedStation = mockStations[0];
+      
+      const now = new Date();
+      const in15min = new Date(now.getTime() + 15 * 60 * 1000);
+      const in45min = new Date(now.getTime() + 45 * 60 * 1000);
+      
+      component.arrivalsDataSource = [
+        { 
+          id: 'a1',
+          station: 'Berlin Hbf',
+          line: 'ICE 101',
+          when: in15min.toISOString(),
+          plannedWhen: in15min.toISOString(),
+          delay: 0,
+          platform: '1'
+        },
+        { 
+          id: 'a2',
+          station: 'Hamburg Hbf',
+          line: 'ICE 202',
+          when: in45min.toISOString(),
+          plannedWhen: new Date(in45min.getTime() - 10 * 60 * 1000).toISOString(),
+          delay: 10,
+          platform: '2'
+        }
+      ];
+      component.filteredArrivals = [...component.arrivalsDataSource];
+    });
+    
+    it('should filter arrivals by maxArrival time', () => {
+      component.arrivalFilterForm.patchValue({
+        maxArrival: 30,
+        minDelay: null,
+        maxDelay: null
+      });
+      
+      component.applyArrivalFilters();
+      
+      expect(component.filteredArrivals.length).toBe(1);
+      expect(component.filteredArrivals[0].id).toBe('a1');
+    });
+    
+    it('should filter arrivals by delay', () => {
+      component.arrivalFilterForm.patchValue({
+        minDelay: '5',
+        maxDelay: null,
+        maxArrival: null
+      });
+      
+      component.applyArrivalFilters();
+      
+      expect(component.filteredArrivals.length).toBe(1);
+      expect(component.filteredArrivals[0].id).toBe('a2');
+      expect(component.filteredArrivals[0].delay).toBe(10);
+    });
+    
+    it('should clear arrival filters', () => {
+      component.arrivalFilterForm.patchValue({
+        maxArrival: 30,
+        minDelay: '5'
+      });
+      
+      component.onClearArrivalFilters();
+      
+      expect(component.arrivalFilterForm.get('maxArrival')?.value).toBe('');
+      expect(component.arrivalFilterForm.get('minDelay')?.value).toBe('');
+      
+      expect(component.filteredArrivals.length).toBe(2);
+    });
   });
 
   it('should apply filters to arrivals', fakeAsync(() => {
-    component.arrivalsDataSource = [...mockArrivals];
-    component.filteredArrivals = [...mockArrivals];
+    component.arrivalsDataSource = JSON.parse(JSON.stringify(mockArrivals));
+    component.filteredArrivals = JSON.parse(JSON.stringify(mockArrivals));
     component.selectedStation = { id: 1, name: 'Test Station', address: 'Test Address' };
     
-    component.arrivalFilterForm.patchValue({ minDelay: '1' });
+    component.arrivalFilterForm.patchValue({ 
+      minDelay: '1',
+      maxDelay: '',
+      maxArrival: ''
+    });
     component.applyArrivalFilters();
     tick();
     fixture.detectChanges();
     
-    const filteredByMinDelay = component.filteredArrivals;
-    expect(filteredByMinDelay.length).toBe(1);
-    expect(filteredByMinDelay[0].delay).toBe(5);
+    expect(component.filteredArrivals.length).toBe(1);
+    expect(component.filteredArrivals[0].id).toBe('a1');
     
-    component.arrivalFilterForm.patchValue({ minDelay: '' });
+    component.arrivalFilterForm.patchValue({ 
+      minDelay: '',
+      maxDelay: '4',
+      maxArrival: ''
+    });
     component.applyArrivalFilters();
     tick();
     fixture.detectChanges();
     
-    component.arrivalFilterForm.patchValue({ maxDelay: '4' });
+    expect(component.filteredArrivals.length).toBe(1);
+    expect(component.filteredArrivals[0].id).toBe('a2');
+    
+    component.arrivalFilterForm.patchValue({ 
+      minDelay: '1', 
+      maxDelay: '10',
+      maxArrival: ''
+    });
     component.applyArrivalFilters();
     tick();
     fixture.detectChanges();
     
-    const filteredByMaxDelay = component.filteredArrivals;
-    expect(filteredByMaxDelay.length).toBe(1);
-    expect(filteredByMaxDelay[0].delay).toBe(0);
+    expect(component.filteredArrivals.length).toBe(1);
+    expect(component.filteredArrivals[0].id).toBe('a1');
     
-    component.arrivalFilterForm.patchValue({ minDelay: '1', maxDelay: '10' });
-    component.applyArrivalFilters();
-    tick();
-    fixture.detectChanges();
-    
-    const filteredByBoth = component.filteredArrivals;
-    expect(filteredByBoth.length).toBe(1);
-    expect(filteredByBoth[0].delay).toBe(5);
-    
-    component.arrivalFilterForm.patchValue({ minDelay: '100', maxDelay: '200' });
+    component.arrivalFilterForm.patchValue({ 
+      minDelay: '100', 
+      maxDelay: '200',
+      maxArrival: ''
+    });
     component.applyArrivalFilters();
     tick();
     fixture.detectChanges();
