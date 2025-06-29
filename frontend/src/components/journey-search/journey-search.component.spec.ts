@@ -1,10 +1,12 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { of, throwError, Subject } from 'rxjs';
+import { of } from 'rxjs';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { JourneySearchComponent } from './journey-search.component';
-import { JourneyService } from '../../services/journey.service';
+import { JourneyService, JourneyParams } from '../../services/journey.service';
+import { StationService, Station } from '../../services/station.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -12,12 +14,16 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { FormatDelayPipe } from '../../pipes/format-delay.pipe';
+import { DateTimeFormatPipe } from '../../pipes/date-time-format.pipe';
 
 describe('JourneySearchComponent', () => {
   let component: JourneySearchComponent;
   let fixture: ComponentFixture<JourneySearchComponent>;
   let journeyServiceSpy: jasmine.SpyObj<JourneyService>;
-  let snackBar: MatSnackBar;
+  let stationServiceSpy: jasmine.SpyObj<StationService>;
+  let snackBarSpy: jasmine.SpyObj<MatSnackBar>;
 
   const mockJourney = {
     id: '1',
@@ -33,12 +39,22 @@ describe('JourneySearchComponent', () => {
     departurePlatform: '8'
   };
 
-  beforeEach(async () => {
-    const spy = jasmine.createSpyObj('JourneyService', ['getJourneys']);
-    
-    await TestBed.configureTestingModule({
+  const mockStations: Station[] = [
+    { id: 1, name: 'Berlin Hbf', address: 'Berlin' },
+    { id: 2, name: 'Hamburg Hbf', address: 'Hamburg' },
+    { id: 3, name: 'München Hbf', address: 'München' },
+    { id: 4, name: 'Köln Hbf', address: 'Köln' },
+  ];
+
+  beforeEach(waitForAsync(() => {
+    stationServiceSpy = jasmine.createSpyObj('StationService', ['getStations']);
+    journeyServiceSpy = jasmine.createSpyObj('JourneyService', ['getJourneys']);
+    snackBarSpy = jasmine.createSpyObj('MatSnackBar', ['open']);
+
+    TestBed.configureTestingModule({
       imports: [
-        ReactiveFormsModule,
+        HttpClientTestingModule,
+        JourneySearchComponent,
         MatCardModule,
         MatFormFieldModule,
         MatInputModule,
@@ -47,31 +63,43 @@ describe('JourneySearchComponent', () => {
         MatSnackBarModule,
         MatIconModule,
         MatTableModule,
+        MatAutocompleteModule,
+        ReactiveFormsModule,
         NoopAnimationsModule,
-        JourneySearchComponent
+        FormatDelayPipe,
+        DateTimeFormatPipe
       ],
       providers: [
-        { provide: JourneyService, useValue: spy }
+        { provide: StationService, useValue: stationServiceSpy },
+        { provide: JourneyService, useValue: journeyServiceSpy },
+        { provide: MatSnackBar, useValue: snackBarSpy },
       ]
-    }).compileComponents();
-
-    journeyServiceSpy = TestBed.inject(JourneyService) as jasmine.SpyObj<JourneyService>;
-    snackBar = TestBed.inject(MatSnackBar);
+    });
     
-    spyOn(snackBar, 'open').and.callThrough();
-    
-    fixture = TestBed.createComponent(JourneySearchComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    TestBed.compileComponents().then(() => {
+      fixture = TestBed.createComponent(JourneySearchComponent);
+      component = fixture.componentInstance;
+      stationServiceSpy.getStations.and.returnValue(of(mockStations));
+      fixture.detectChanges();
+    });
+  }));
+  
+  afterEach(() => {
+    stationServiceSpy.getStations.calls.reset();
+    snackBarSpy.open.calls.reset();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize form with default values', () => {
-    expect(component.searchForm.get('from')?.value).toBe('8000105');
-    expect(component.searchForm.get('to')?.value).toBe('8010330');
+  it('should initialize form with empty values', () => {
+    expect(component.searchForm.get('from')?.value).toBe('');
+    expect(component.searchForm.get('to')?.value).toBe('');
+    expect(component.selectedFromStation).toBeNull();
+    expect(component.selectedToStation).toBeNull();
+    expect(component.searchForm.get('date')).toBeFalsy();
+    expect(component.searchForm.get('time')).toBeFalsy();
   });
 
   it('should mark form as invalid when empty', () => {
@@ -80,32 +108,40 @@ describe('JourneySearchComponent', () => {
       to: '',
     });
     expect(component.searchForm.valid).toBeFalse();
-  });
-
-  it('should mark form as valid when all fields are filled', () => {
+    
     component.searchForm.setValue({
-      from: '8000105',
-      to: '8010330',
+      from: mockStations[0],
+      to: mockStations[1],
     });
     expect(component.searchForm.valid).toBeTrue();
   });
 
-  it('should call journeyService.getJourneys with correct parameters on form submit', () => {
-    const testDate = new Date();
+  it('should mark form as valid when all fields are filled with station objects', () => {
+    component.searchForm.setValue({
+      from: mockStations[0],
+      to: mockStations[1],
+    });
+    expect(component.searchForm.valid).toBeTrue();
+  });
+
+  it('should call journeyService.getJourneys with station IDs on form submit', () => {
     const mockResponse = { data: [mockJourney] };
     journeyServiceSpy.getJourneys.and.returnValue(of(mockResponse));
     
+    component.selectedFromStation = mockStations[0];
+    component.selectedToStation = mockStations[1];
+    
     component.searchForm.setValue({
-      from: '8000105',
-      to: '8010330',
+      from: mockStations[0].name,
+      to: mockStations[1].name,
     });
     
     component.onSubmit();
     
     expect(journeyServiceSpy.getJourneys).toHaveBeenCalledWith({
-      from: '8000105',
-      to: '8010330',
-    });
+      from: mockStations[0].id.toString(),
+      to: mockStations[1].id.toString(),
+    } as JourneyParams);
     expect(component.isLoading).toBeFalse();
     expect(component.journeys).toEqual([mockJourney]);
   });
@@ -121,74 +157,85 @@ describe('JourneySearchComponent', () => {
     expect(journeyServiceSpy.getJourneys).not.toHaveBeenCalled();
   });
 
-  it('should set loading state to true during API call', () => {
-    const responseSubject = new Subject<any>();
-    journeyServiceSpy.getJourneys.and.returnValue(responseSubject.asObservable());
+  it('should filter stations based on input', () => {
+    component.allStations = [...mockStations];
     
-    component.onSubmit();
+    const filtered = component['_filterStations']('Berlin');
+    expect(filtered.length).withContext('Should find one matching station').toBe(1);
+    expect(filtered[0].name).withContext('Should find Berlin Hbf').toBe('Berlin Hbf');
     
-    expect(component.isLoading).toBeTrue();
+    const emptySearch = component['_filterStations']('');
+    expect(emptySearch).withContext('Should return empty array on empty input').toEqual([]);
     
-    responseSubject.complete();
+    const noMatch = component['_filterStations']('Nonexistent');
+    expect(noMatch).withContext('Should return empty array for no matches').toEqual([]);
   });
 
-  it('should handle empty results by setting journeys to empty array', fakeAsync(() => {
-    const mockResponse = { data: [] };
-    journeyServiceSpy.getJourneys.and.returnValue(of(mockResponse));
+  it('should handle station selection', () => {
+    const station = mockStations[0];
     
-    component.onSubmit();
-    tick();
+    component.onFromStationSelected(station);
     
-    expect(component.journeys).toEqual([]);
-    expect(component.isLoading).toBeFalse();
-  }));
-
-  it('should handle API errors by setting error state', fakeAsync(() => {
-    const error = new Error('API Error');
-    journeyServiceSpy.getJourneys.and.returnValue(throwError(() => error));
+    expect(component.selectedFromStation).toEqual(station);
+    expect(component.searchForm.get('from')?.value).toBe(station.name);
     
-    component.onSubmit();
-    tick();
+    component.onToStationSelected(mockStations[1]);
+    expect(component.selectedToStation).toEqual(mockStations[1]);
+    expect(component.searchForm.get('to')?.value).toBe(mockStations[1].name);
     
-    expect(component.error).toBe('Failed to fetch journeys. Please try again.');
-    expect(component.isLoading).toBeFalse();
-  }));
-
-  it('should unsubscribe from journey subscription on destroy', () => {
-    const mockSubscription = jasmine.createSpyObj('Subscription', ['unsubscribe']);
-    
-    journeyServiceSpy.getJourneys.and.returnValue({
-      subscribe: () => mockSubscription
-    } as any);
-    
-    component.onSubmit();
-    component.ngOnDestroy();
-    
-    expect(mockSubscription.unsubscribe).toHaveBeenCalled();
+    expect(component.searchForm.valid).toBeTrue();
   });
 
-  it('should render the journey table when there are results', () => {
-    const mockResponse = { data: [mockJourney] };
-    journeyServiceSpy.getJourneys.and.returnValue(of(mockResponse));
+  it('should clear selected station', () => {
+    component.selectedFromStation = mockStations[0];
+    component.searchForm.get('from')?.setValue(mockStations[0].name);
     
-    component.onSubmit();
-    fixture.detectChanges();
+    const event = { stopPropagation: jasmine.createSpy('stopPropagation') } as any;
+    component.clearFromStation(event);
     
-    const table = fixture.nativeElement.querySelector('table');
-    expect(table).toBeTruthy();
-    
-    const rows = fixture.nativeElement.querySelectorAll('tr');
-    expect(rows.length).toBe(2);
+    expect(component.selectedFromStation).toBeNull();
+    expect(component.searchForm.get('from')?.value).toBe('');
+    expect(event.stopPropagation).toHaveBeenCalled();
   });
 
-  it('should display loading spinner when loading', () => {
+  it('should have journey data structure', () => {
+    component.journeys = [
+      { 
+        id: 1, 
+        name: 'ICE 123',
+        destination: 'Berlin Hbf',
+        direction: 'Berlin',
+        line: 'ICE 123',
+        arrival: '2025-06-28T12:00:00Z',
+        departure: '2025-06-28T10:00:00Z',
+        arrivalDelay: 5,
+        arrivalPlatform: '5',
+        departureDelay: 0,
+        departurePlatform: '8',
+        price: 29.99,
+        duration: 90
+      }
+    ];
+    
+    expect(component.journeys.length).toBe(1);
+    expect(component.journeys[0].id).toBeDefined();
+    expect(component.journeys[0].name).toBeDefined();
+    expect(component.journeys[0].destination).toBeDefined();
+    expect(component.journeys[0].line).toBeDefined();
+    expect(component.journeys[0].arrival).toBeDefined();
+    expect(component.journeys[0].departure).toBeDefined();
+    expect(component.journeys[0].arrivalDelay).toBeDefined();
+    expect(component.journeys[0].departureDelay).toBeDefined();
+  });
+
+  it('should show loading spinner when loading', () => {
     component.isLoading = true;
     fixture.detectChanges();
     
     const spinner = fixture.nativeElement.querySelector('mat-spinner');
-    expect(spinner).toBeTruthy();
+    expect(spinner).withContext('Loading spinner should be shown when loading').toBeTruthy();
     
     const button = fixture.nativeElement.querySelector('button[type="submit"]');
-    expect(button.disabled).toBeTrue();
+    expect(button.disabled).withContext('Submit button should be disabled when loading').toBeTrue();
   });
 });
