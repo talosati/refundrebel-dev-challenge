@@ -4,6 +4,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { AppComponent } from './app.component';
 import { JourneyService } from '../services/journey.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -17,6 +18,7 @@ describe('AppComponent', () => {
     
     await TestBed.configureTestingModule({
       imports: [
+        HttpClientTestingModule,
         MatToolbarModule,
         AppComponent
       ],

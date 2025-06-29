@@ -170,7 +170,8 @@ export class StationSearchComponent implements OnInit, OnDestroy {
     const selectedStation: Station = event.option?.value ? event.option.value : event;
     if (selectedStation && selectedStation.name) {
       this.filterForm.get('searchTerm')?.setValue(selectedStation.name);
-      this.searchEvent.emit(selectedStation.id.toString());
+      this.selectedStation = selectedStation;
+      this.searchEvent.emit(selectedStation.name);
     }
   }
 
@@ -189,6 +190,8 @@ export class StationSearchComponent implements OnInit, OnDestroy {
         this.selectedStation = null;
         this.arrivalsDataSource = [];
         this.departuresDataSource = [];
+        this.filteredArrivals = [];
+        this.filteredDepartures = [];
       }
       
       this.searchEvent.emit(searchTerm);
