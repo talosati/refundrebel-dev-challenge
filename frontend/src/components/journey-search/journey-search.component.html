@@ -55,6 +55,11 @@
         <mat-error>{{ error }}</mat-error>
       </div>
     </mat-card-content>
+
+    <div class="no-results" *ngIf="!isLoading && journeys.length === 0">
+      <mat-icon>train</mat-icon>
+      <p>No journeys found for the selected criteria</p>
+    </div>
   </mat-card>
   
   <div *ngIf="journeys && journeys.length > 0" class="results-container">

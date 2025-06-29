@@ -95,12 +95,6 @@ export class JourneySearchComponent implements OnDestroy {
       next: (response: any) => {
         this.journeys = response.data || [];
         this.isLoading = false;
-        if (this.journeys.length === 0) {
-          this.snackBar.open('No journeys found for the selected criteria', 'Close', {
-            duration: 3000,
-            panelClass: ['mat-toolbar', 'mat-warn']
-          });
-        }
       },
       error: (err: any) => {
         console.error('Error fetching journeys:', err);

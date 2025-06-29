@@ -139,7 +139,7 @@
                   {{item.when | dateTimeFormat}}
                   <mat-icon *ngIf="!item.delay" class="on-time-icon">check_circle</mat-icon>
                   <span *ngIf="item.delay > 0" class="delay-indicator">
-                    +{{item.delay / 60 | number:'1.0-0'}} min
+                    {{item.delay | formatDelay}}
                   </span>
                 </span>
               </div>
@@ -218,7 +218,7 @@
                   {{item.when | dateTimeFormat}}
                   <mat-icon *ngIf="!item.delay" class="on-time-icon">check_circle</mat-icon>
                   <span *ngIf="item.delay > 0" class="delay-indicator">
-                    +{{item.delay / 60 | number:'1.0-0'}} min
+                    {{item.delay | formatDelay}}
                   </span>
                 </span>
               </div>
