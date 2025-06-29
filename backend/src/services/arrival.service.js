@@ -24,7 +24,6 @@ class ArrivalService {
         return p && (p.national || p.nationalExpress || p.regional || p.regionalExpress);
       });
 
-      console.log("rawArrivals", rawArrivals);
       return Arrival.fromRawArrivals(rawArrivals);
     } catch (error) {
       console.error('Error fetching arrivals:', error);

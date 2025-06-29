@@ -18,10 +18,13 @@ This is a full-stack application with a frontend built using Angular and a backe
 - CORS for cross-origin requests
 - Morgan for HTTP request logging
 - dotenv for environment variables
-
-### DB-Vendo Custom Client
-
-The `db-vendo-custom` directory contains a custom JavaScript client for interacting with Deutsche Bahn's public transport APIs. This client is running in a separate Docker container and our backend service communicates with it through axios to fetch journey information and other public transport data.
+- db-vendo-client for Deutsche Bahn public transport APIs
+- hafas-client for Deutsche Bahn public transport APIs
+- hafas-rest-api for Deutsche Bahn public transport APIs
+- axios for HTTP requests
+- jest for testing
+- supertest for testing
+- node-mocks-http for testing
 
 ### Development Tools
 - Docker & Docker Compose
@@ -52,12 +55,21 @@ The `db-vendo-custom` directory contains a custom JavaScript client for interact
 3. Access the application:
    - Frontend: http://localhost:4200
    - Backend API: http://localhost:3000
+   - DB-Vendo Client: http://localhost:3001
 
 ### Development Workflow
 
 - The application is configured with hot-reloading for both frontend and backend during development.
 - Frontend code changes will automatically reflect in the browser.
 - Backend changes will trigger a restart of the Node.js server.
+
+### Testing
+
+- The application is configured with Jest and Supertest for testing.
+- To run tests, use the following command:
+  ```bash
+  npm run test
+  ```
 
 ### Stopping the Application
 
@@ -83,7 +95,6 @@ docker system prune -a --volumes
 .
 ├── backend/           # Node.js/Express backend
 ├── frontend/          # Angular frontend
-├── db-vendo-custom/   # Custom JavaScript client for Deutsche Bahn APIs
 ├── docker-compose.yml # Docker Compose configuration
 └── README.md          # This file
 ```

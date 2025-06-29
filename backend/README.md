@@ -1,6 +1,6 @@
 # Backend Service
 
-This backend service runs as a Docker container and communicates with `db-vendo-custom` Docker container using Axios.
+This backend service runs as a Docker container and communicates with HAFAS API using Axios.
 
 ## Logs
 

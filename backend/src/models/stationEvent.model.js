@@ -24,7 +24,6 @@ class StationEvent {
   }
 
   static fromRawStationEvents(rawStationEvents) {
-    console.log("rawStationEvents", rawStationEvents)
     return rawStationEvents.map(stationEvent => new StationEvent({
         station: stationEvent.stop.name,
         line: stationEvent.line.name,

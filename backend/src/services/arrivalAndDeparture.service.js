@@ -37,9 +37,6 @@ class ArrivalAndDepartureService {
         const p = departure.stop.products;
         return p && (p.national || p.nationalExpress || p.regional || p.regionalExpress);
       });
-
-      console.log("rawArrivals", rawArrivals);
-      console.log("rawDepartures", rawDepartures);
       
       const arrivals = await StationEvent.fromRawStationEvents(rawArrivals);
       const departures = await StationEvent.fromRawStationEvents(rawDepartures);
