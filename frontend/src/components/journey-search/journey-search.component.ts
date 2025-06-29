@@ -11,7 +11,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
-import { DateTimeFormatPipe } from '../../pipes';
+import { FormatDelayPipe, getDelayClass } from '../../pipes/format-delay.pipe';
+import { DateTimeFormatPipe } from '../../pipes/date-time-format.pipe';
 
 @Component({
   selector: 'app-journey-search',
@@ -27,7 +28,8 @@ import { DateTimeFormatPipe } from '../../pipes';
     MatSnackBarModule,
     MatIconModule,
     MatTableModule,
-    DateTimeFormatPipe
+    DateTimeFormatPipe,
+    FormatDelayPipe
   ],
   templateUrl: './journey-search.component.html',
   styleUrls: ['./journey-search.component.scss']
@@ -54,6 +56,8 @@ export class JourneySearchComponent implements OnDestroy {
   ];
 
   private journeySubscription?: Subscription;
+
+  getDelayClass = getDelayClass;
 
   constructor(
     private formBuilder: FormBuilder,

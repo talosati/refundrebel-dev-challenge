@@ -321,6 +321,10 @@
             white-space: nowrap;
             display: inline-flex;
             align-items: center;
+
+            &.hidden {
+              display: none;
+            }
           }
           
           .on-time {

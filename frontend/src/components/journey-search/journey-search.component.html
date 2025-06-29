@@ -103,7 +103,9 @@
         <ng-container matColumnDef="arrivalDelay">
           <th mat-header-cell *matHeaderCellDef>Arrival Delay</th>
           <td mat-cell *matCellDef="let element">
-            {{element.arrivalDelay !== null && element.arrivalDelay !== undefined ? (element.arrivalDelay + ' min') : '-'}}
+            <span [class]="getDelayClass(element.arrivalDelay)">
+              {{element.arrivalDelay | formatDelay}}
+            </span>
           </td>
         </ng-container>
 
@@ -120,7 +122,9 @@
         <ng-container matColumnDef="departureDelay">
           <th mat-header-cell *matHeaderCellDef>Departure Delay</th>
           <td mat-cell *matCellDef="let element">
-            {{element.departureDelay !== null && element.departureDelay !== undefined ? (element.departureDelay + ' min') : '-'}}
+            <span [class]="getDelayClass(element.departureDelay)">
+              {{element.departureDelay | formatDelay}}
+            </span>
           </td>
         </ng-container>
 
@@ -166,20 +170,20 @@
           <span class="label">Departure:</span>
           <span class="value">
             {{journey.departure | dateTimeFormat}}
-            <span *ngIf="journey.departureDelay !== null && journey.departureDelay !== undefined && journey.departureDelay > 0" class="delay">
-              +{{journey.departureDelay}} min
+            <span *ngIf="journey.departureDelay !== null && journey.departureDelay !== undefined" class="delay" [class.hidden]="journey.departureDelay === 0">
+<span [class]="getDelayClass(journey.departureDelay)">{{journey.departureDelay | formatDelay}}</span>
             </span>
-            <mat-icon *ngIf="!journey.departureDelay || journey.departureDelay === 0" class="on-time">check_circle</mat-icon>
+            <mat-icon *ngIf="journey.departureDelay === 0" class="on-time">check_circle</mat-icon>
           </span>
         </div>
         <div class="card-row">
           <span class="label">Arrival:</span>
           <span class="value">
             {{journey.arrival | dateTimeFormat}}
-            <span *ngIf="journey.arrivalDelay !== null && journey.arrivalDelay !== undefined && journey.arrivalDelay > 0" class="delay">
-              +{{journey.arrivalDelay}} min
+            <span *ngIf="journey.arrivalDelay !== null && journey.arrivalDelay !== undefined" class="delay" [class.hidden]="journey.arrivalDelay === 0">
+<span [class]="getDelayClass(journey.arrivalDelay)">{{journey.arrivalDelay | formatDelay}}</span>
             </span>
-            <mat-icon *ngIf="!journey.arrivalDelay || journey.arrivalDelay === 0" class="on-time">check_circle</mat-icon>
+            <mat-icon *ngIf="journey.arrivalDelay === 0" class="on-time">check_circle</mat-icon>
           </span>
         </div>
       </div>

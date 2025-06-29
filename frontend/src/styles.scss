@@ -30,6 +30,16 @@ html, body {
   font-size: 0.9em;
 }
 
+.on-time {
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.delayed {
+  color: #d32f2f;
+  font-weight: 500;
+}
+
 .mat-toolbar {
   position: relative;
   z-index: 2;

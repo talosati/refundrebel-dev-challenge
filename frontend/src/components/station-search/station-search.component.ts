@@ -14,7 +14,8 @@ import { MatSortModule, MatSort } from '@angular/material/sort';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { HttpClient } from '@angular/common/http';
 import { Station, StationService } from '../../services/station.service';
-import { DateTimeFormatPipe } from '../../pipes';
+import { FormatDelayPipe, getDelayClass } from '../../pipes/format-delay.pipe';
+import { DateTimeFormatPipe } from '../../pipes/date-time-format.pipe';
 
 @Component({
   selector: 'app-station-search',
@@ -33,7 +34,8 @@ import { DateTimeFormatPipe } from '../../pipes';
     MatTableModule,
     MatSortModule,
     MatPaginatorModule,
-    DateTimeFormatPipe
+    DateTimeFormatPipe,
+    FormatDelayPipe
   ],
   providers: [
     HttpClient,
@@ -60,6 +62,8 @@ export class StationSearchComponent implements OnInit, OnDestroy {
   arrivalsDataSource: any[] = [];
   departuresDataSource: any[] = [];
   isLoading = false;
+
+  getDelayClass = getDelayClass;
 
   constructor(private stationService: StationService) {}
 
@@ -169,11 +173,5 @@ export class StationSearchComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.stationSubscription?.unsubscribe();
-  }
-
-  formatDelay(delayInSeconds: number): string {
-    if (!delayInSeconds) return 'On time';
-    const minutes = Math.floor(delayInSeconds / 60);
-    return `${minutes} min${minutes !== 1 ? 's' : ''} late`;
   }
 }
