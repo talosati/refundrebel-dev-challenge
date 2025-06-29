@@ -156,7 +156,10 @@
         
         <div class="mobile-view">
           <div class="journey-cards">
-            <div *ngFor="let item of departuresDataSource" class="journey-card">
+            <div *ngIf="filteredDepartures.length === 0" class="no-results">
+              No departures match the current filters.
+            </div>
+            <div *ngFor="let item of filteredDepartures" class="journey-card">
               <div class="card-row">
                 <span class="card-label">Line:</span>
                 <span class="line-badge" [style.background]="item.lineColor || '#cccccc'">
