@@ -61,9 +61,11 @@ export class StationSearchComponent implements OnInit, OnDestroy {
   arrivalsDataSource: any[] = [];
   departuresDataSource: any[] = [];
   filteredDepartures: any[] = [];
+  filteredArrivals: any[] = [];
   isLoading = false;
   hasSearched = false;
   filterForm: FormGroup;
+  arrivalFilterForm: FormGroup;
   searchTerm = '';
 
   getDelayClass = getDelayClass;
@@ -74,6 +76,11 @@ export class StationSearchComponent implements OnInit, OnDestroy {
   ) {
     this.filterForm = this.fb.group({
       searchTerm: [{ value: '', disabled: false }],
+      minDelay: [''],
+      maxDelay: ['']
+    });
+
+    this.arrivalFilterForm = this.fb.group({
       minDelay: [''],
       maxDelay: ['']
     });
@@ -101,6 +108,10 @@ export class StationSearchComponent implements OnInit, OnDestroy {
       if (value.minDelay !== undefined || value.maxDelay !== undefined) {
         this.applyFilters();
       }
+    });
+
+    this.arrivalFilterForm.valueChanges.subscribe(() => {
+      this.applyArrivalFilters();
     });
   }
 
@@ -192,6 +203,14 @@ export class StationSearchComponent implements OnInit, OnDestroy {
     this.applyFilters();
   }
 
+  onClearArrivalFilters(): void {
+    this.arrivalFilterForm.patchValue({
+      minDelay: '',
+      maxDelay: ''
+    });
+    this.applyArrivalFilters();
+  }
+
   applyFilters(): void {
     if (!this.departuresDataSource) {
       this.filteredDepartures = [];
@@ -228,11 +247,13 @@ export class StationSearchComponent implements OnInit, OnDestroy {
           this.arrivalsDataSource = response.arrivals;
           this.departuresDataSource = response.departures;
           this.filteredDepartures = [...this.departuresDataSource];
+          this.filteredArrivals = [...this.arrivalsDataSource];
           this.arrivalsLoaded.emit(response);
         } else {
           this.arrivalsDataSource = [];
           this.departuresDataSource = [];
           this.filteredDepartures = [];
+          this.filteredArrivals = [];
         }
       },
       error: (error) => {
@@ -241,7 +262,35 @@ export class StationSearchComponent implements OnInit, OnDestroy {
         this.arrivalsDataSource = [];
         this.departuresDataSource = [];
         this.filteredDepartures = [];
+        this.filteredArrivals = [];
       }
+    });
+  }
+
+  applyArrivalFilters(): void {
+    if (!this.arrivalsDataSource) {
+      this.filteredArrivals = [];
+      return;
+    }
+
+    const minDelay = this.arrivalFilterForm.get('minDelay')?.value;
+    const maxDelay = this.arrivalFilterForm.get('maxDelay')?.value;
+
+    if (!minDelay && !maxDelay) {
+      this.filteredArrivals = [...this.arrivalsDataSource];
+      return;
+    }
+
+    this.filteredArrivals = this.arrivalsDataSource.filter(arrival => {
+      const delay = arrival.delay || 0;
+      
+      const minDelayNum = minDelay ? Number(minDelay) : null;
+      const maxDelayNum = maxDelay ? Number(maxDelay) : null;
+      
+      const minDelayValid = minDelayNum === null || delay >= minDelayNum;
+      const maxDelayValid = maxDelayNum === null || delay <= maxDelayNum;
+      
+      return minDelayValid && maxDelayValid;
     });
   }
 
@@ -250,9 +299,11 @@ export class StationSearchComponent implements OnInit, OnDestroy {
     this.arrivalsDataSource = [];
     this.departuresDataSource = [];
     this.filteredDepartures = [];
+    this.filteredArrivals = [];
     this.hasSearched = false;
     this.selectedStation = null;
     this.filterForm.reset();
+    this.arrivalFilterForm.reset();
     this.searchEvent.emit('');
   }
 

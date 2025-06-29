@@ -183,9 +183,33 @@
       </div>
 
       <div class="arrivals-container" *ngIf="arrivalsDataSource.length > 0">
-        <h3>Arrivals</h3>
+        <div class="departures-header">
+          <h3>Arrivals</h3>
+          <form [formGroup]="arrivalFilterForm" class="delay-filters">
+            <mat-form-field appearance="outline" class="delay-filter">
+              <mat-label>Min Delay</mat-label>
+              <input matInput type="number" min="0" formControlName="minDelay" placeholder="Min">
+              <mat-hint>Minutes</mat-hint>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="delay-filter">
+              <mat-label>Max Delay</mat-label>
+              <input matInput type="number" min="0" formControlName="maxDelay" placeholder="Max">
+              <mat-hint>Minutes</mat-hint>
+            </mat-form-field>
+            <button 
+              mat-stroked-button 
+              color="warn" 
+              type="button"
+              (click)="onClearArrivalFilters()"
+              [disabled]="!arrivalFilterForm.dirty"
+              class="clear-filters"
+              aria-label="Clear filters">
+              Clear Filters
+            </button>
+          </form>
+        </div>
         <div class="table-container desktop-view">
-          <table mat-table [dataSource]="arrivalsDataSource" matSort class="arrivals-table">
+          <table mat-table [dataSource]="filteredArrivals" matSort class="arrivals-table">
               
             <ng-container matColumnDef="station">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>To</th>
@@ -225,13 +249,22 @@
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedArrivalColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedArrivalColumns;"></tr>
+            <tr 
+              mat-row 
+              *matRowDef="let row; columns: displayedArrivalColumns;"
+              [class.highlighted]="row.delay > 0">
+            </tr>
+            <tr class="mat-row no-results" *ngIf="filteredArrivals.length === 0">      
+              <td class="mat-cell" [attr.colspan]="displayedArrivalColumns.length">
+                No arrivals match the current filters.
+              </td>
+            </tr>
           </table>
         </div>
         
         <div class="mobile-view">
           <div class="journey-cards">
-            <div *ngFor="let item of arrivalsDataSource" class="journey-card">
+            <div *ngFor="let item of filteredArrivals" class="journey-card">
               <div class="card-row">
                 <span class="card-label">Line:</span>
                 <span class="line-badge" [style.background]="item.lineColor || '#cccccc'">
