@@ -1,5 +1,7 @@
 const axios = require('axios');
 
+const originalEnv = { ...process.env };
+
 process.env.DB_VENDO_BASE_URL = 'http://test-api.com';
 process.env.FRONTEND_URL = 'http://test-frontend.com';
 
@@ -28,7 +30,7 @@ describe('JourneyService', () => {
   });
 
   afterEach(() => {
-    process.env = originalEnv;
+    process.env = { ...originalEnv };
   });
 
   describe('getJourneys', () => {
@@ -130,6 +132,84 @@ describe('JourneyService', () => {
     it('should handle empty journeys array', async () => {
       const mockResponse = { data: { journeys: [] } };
       axios.get.mockResolvedValue(mockResponse);
+
+      const result = await JourneyService.getJourneys(mockParams);
+      expect(result).toEqual([]);
+    });
+
+    it('should fetch and process journeys with additional parameters', async () => {
+      const mockResponse = {
+        data: {
+          journeys: [
+            {
+              legs: [
+                {
+                  origin: { 
+                    id: '123',
+                    name: 'Berlin Hbf',
+                    type: 'station',
+                    products: { national: true }
+                  },
+                  destination: { name: 'Hamburg Hbf' },
+                  direction: 'Hamburg Hbf',
+                  line: { name: 'ICE 123' },
+                  arrival: '2025-06-28T12:00:00+02:00',
+                  departure: '2025-06-28T10:00:00+02:00',
+                  arrivalDelay: 300,
+                  departureDelay: 0,
+                  arrivalPlatform: '5',
+                  departurePlatform: '8'
+                }
+              ]
+            }
+          ]
+        }
+      };
+
+      axios.get.mockResolvedValue(mockResponse);
+
+      const result = await JourneyService.getJourneys(mockParams);
+
+      expect(axios.get).toHaveBeenCalledWith(
+        'http://test-api.com/journeys',
+        {
+          params: {
+            from: '123',
+            to: '456',
+            departure: '2025-06-28T10:00:00'
+          },
+          headers: {
+            'Accept': 'application/json',
+            'Origin': 'http://test-frontend.com'
+          }
+        }
+      );
+
+      expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBe(1);
+      expect(result[0]).toHaveProperty('id', '123');
+      expect(result[0]).toHaveProperty('name', 'Berlin Hbf');
+      expect(result[0]).toHaveProperty('destination', 'Hamburg Hbf');
+      expect(result[0]).toHaveProperty('line', 'ICE 123');
+    });
+
+    it('should handle API errors gracefully', async () => {
+      const errorMessage = 'Network Error';
+      axios.get.mockRejectedValue(new Error(errorMessage));
+
+      await expect(JourneyService.getJourneys(mockParams)).rejects.toThrow(errorMessage);
+    });
+
+    it('should handle empty responses', async () => {
+      axios.get.mockResolvedValue({ data: {} });
+
+      const result = await JourneyService.getJourneys(mockParams);
+      expect(result).toEqual([]);
+    });
+
+    it('should handle missing journeys in response', async () => {
+      axios.get.mockResolvedValue({ data: { somethingElse: [] } });
 
       const result = await JourneyService.getJourneys(mockParams);
       expect(result).toEqual([]);
