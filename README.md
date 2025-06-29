@@ -63,14 +63,6 @@ This is a full-stack application with a frontend built using Angular and a backe
 - Frontend code changes will automatically reflect in the browser.
 - Backend changes will trigger a restart of the Node.js server.
 
-### Testing
-
-- The application is configured with Jest and Supertest for testing.
-- To run tests, use the following command:
-  ```bash
-  npm run test
-  ```
-
 ### Stopping the Application
 
 To stop all running containers:

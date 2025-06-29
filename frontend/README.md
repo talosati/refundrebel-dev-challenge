@@ -12,7 +12,7 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 1. Navigate to the project root directory
 2. Start the application using Docker Compose:
    ```bash
-   docker-compose up frontend
+   docker compose up frontend
    ```
 3. Once the container is running, open your browser and navigate to `http://localhost:4200/`
 4. The application will automatically reload when you modify source files (hot-reload enabled)
@@ -21,7 +21,7 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 To stop the application, press `Ctrl+C` in the terminal or run:
 ```bash
-docker-compose down
+docker compose down frontend
 ```
 
 ## Local Development (Without Docker)
@@ -50,7 +50,7 @@ Angular CLI includes powerful code scaffolding tools. To generate a new componen
 
 ```bash
 # Inside the frontend directory or using Docker:
-docker-compose exec frontend ng generate component component-name
+docker compose exec frontend ng generate component component-name
 
 # Or if running locally:
 ng generate component component-name
@@ -59,7 +59,7 @@ ng generate component component-name
 For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
 
 ```bash
-docker-compose exec frontend ng generate --help
+docker compose exec frontend ng generate --help
 # or
 ng generate --help
 ```
@@ -70,7 +70,7 @@ To build the project for production:
 
 ```bash
 # Using Docker
-docker-compose exec frontend ng build
+docker compose exec frontend ng build
 
 # Or locally
 ng build
