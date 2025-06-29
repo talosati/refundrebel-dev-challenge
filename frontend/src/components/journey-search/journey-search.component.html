@@ -7,23 +7,71 @@
     <mat-card-content>
       <form [formGroup]="searchForm" (ngSubmit)="onSubmit()" class="search-form">
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>From (Station ID)</mat-label>
+          <mat-label>From (Station Name)</mat-label>
           <input 
             matInput 
-            type="text" 
-            formControlName="from" 
-            placeholder="e.g., 8000105"
-            required>
+            type="text"
+            [matAutocomplete]="fromAuto"
+            formControlName="from"
+            [placeholder]="!stationsLoaded ? 'Loading stations...' : 'Start typing a station name...'"
+            #fromInput>
+          <mat-autocomplete #fromAuto="matAutocomplete" (optionSelected)="onFromStationSelected($event.option.value)">
+            <mat-option *ngFor="let station of filteredFromStations | async" [value]="station">
+              {{ station.name }}
+            </mat-option>
+            <mat-option *ngIf="!stationsLoaded" disabled>
+              <div class="loading-option">
+                <mat-spinner diameter="20"></mat-spinner>
+                <span>Loading stations...</span>
+              </div>
+            </mat-option>
+            <mat-option *ngIf="stationsLoaded && (filteredFromStations | async)?.length === 0 && fromInput.value" disabled>
+              No stations found for "{{ fromInput.value }}"
+            </mat-option>
+          </mat-autocomplete>
+          <button 
+            matSuffix 
+            mat-icon-button 
+            *ngIf="fromInput.value" 
+            (click)="clearFromStation($event)"
+            type="button"
+            aria-label="Clear">
+            <mat-icon>close</mat-icon>
+          </button>
         </mat-form-field>
         
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>To (Station ID)</mat-label>
+          <mat-label>To (Station Name)</mat-label>
           <input 
             matInput 
-            type="text" 
-            formControlName="to" 
-            placeholder="e.g., 8010330"
-            required>
+            type="text"
+            [matAutocomplete]="toAuto"
+            formControlName="to"
+            [placeholder]="!stationsLoaded ? 'Loading stations...' : 'Start typing a station name...'"
+            #toInput>
+          <mat-autocomplete #toAuto="matAutocomplete" (optionSelected)="onToStationSelected($event.option.value)">
+            <mat-option *ngFor="let station of filteredToStations | async" [value]="station">
+              {{ station.name }}
+            </mat-option>
+            <mat-option *ngIf="!stationsLoaded" disabled>
+              <div class="loading-option">
+                <mat-spinner diameter="20"></mat-spinner>
+                <span>Loading stations...</span>
+              </div>
+            </mat-option>
+            <mat-option *ngIf="stationsLoaded && (filteredToStations | async)?.length === 0 && toInput.value" disabled>
+              No stations found for "{{ toInput.value }}"
+            </mat-option>
+          </mat-autocomplete>
+          <button 
+            matSuffix 
+            mat-icon-button 
+            *ngIf="toInput.value" 
+            (click)="$event.stopPropagation(); clearToStation($event)"
+            type="button"
+            aria-label="Clear">
+            <mat-icon>close</mat-icon>
+          </button>
         </mat-form-field>
         
         <div class="button-container">
@@ -70,11 +118,6 @@
         <ng-container matColumnDef="destination">
           <th mat-header-cell *matHeaderCellDef>To</th>
           <td mat-cell *matCellDef="let element">{{element.destination || 'N/A'}}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="direction">
-          <th mat-header-cell *matHeaderCellDef>Direction</th>
-          <td mat-cell *matCellDef="let element">{{element.direction || 'N/A'}}</td>
         </ng-container>
 
         <ng-container matColumnDef="line">
