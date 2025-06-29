@@ -101,15 +101,15 @@
           </form>
         </div>
         <div class="table-container desktop-view">
-          <table mat-table [dataSource]="filteredDepartures" matSort class="departures-table">
+          <table mat-table [dataSource]="filteredDepartures" class="departures-table">
                
             <ng-container matColumnDef="station">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>From</th>
+              <th mat-header-cell *matHeaderCellDef>From</th>
               <td mat-cell *matCellDef="let element">{{element.station || '--'}}</td>
             </ng-container>
 
             <ng-container matColumnDef="line">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Line</th>
+              <th mat-header-cell *matHeaderCellDef>Line</th>
               <td mat-cell *matCellDef="let element">
                 <span class="line-badge" [style.background]="element.lineColor || '#cccccc'">
                   {{element.line || '--'}}
@@ -118,14 +118,14 @@
             </ng-container>
 
             <ng-container matColumnDef="departure">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Departure</th>
+              <th mat-header-cell *matHeaderCellDef>Departure</th>
               <td mat-cell *matCellDef="let element">
                 {{element.when | dateTimeFormat}}
               </td>
             </ng-container>
 
             <ng-container matColumnDef="departureDelay">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Departure Delay</th>
+              <th mat-header-cell *matHeaderCellDef>Departure Delay</th>
               <td mat-cell *matCellDef="let element">
                 <span [class]="getDelayClass(element.delay)">
                   {{element.delay | formatDelay}}
@@ -134,7 +134,7 @@
             </ng-container>
 
             <ng-container matColumnDef="departurePlatform">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Departure Platform</th>
+              <th mat-header-cell *matHeaderCellDef>Departure Platform</th>
               <td mat-cell *matCellDef="let element">
                 <span class="platform-badge">{{element.departurePlatform || element.platform || '--'}}</span>
               </td>
@@ -217,15 +217,15 @@
           </form>
         </div>
         <div class="table-container desktop-view">
-          <table mat-table [dataSource]="filteredArrivals" matSort class="arrivals-table">
+          <table mat-table [dataSource]="filteredArrivals" class="arrivals-table">
               
             <ng-container matColumnDef="station">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>To</th>
+              <th mat-header-cell *matHeaderCellDef>To</th>
               <td mat-cell *matCellDef="let element">{{element.station || '--'}}</td>
             </ng-container>
 
             <ng-container matColumnDef="line">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Line</th>
+              <th mat-header-cell *matHeaderCellDef>Line</th>
               <td mat-cell *matCellDef="let element">
                 <span class="line-badge" [style.background]="element.lineColor || '#cccccc'">
                   {{element.line || '--'}}
@@ -234,14 +234,14 @@
             </ng-container>
 
             <ng-container matColumnDef="arrival">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Arrival</th>
+              <th mat-header-cell *matHeaderCellDef>Arrival</th>
               <td mat-cell *matCellDef="let element">
                 {{element.when | dateTimeFormat}}
               </td>
             </ng-container>
 
             <ng-container matColumnDef="delay">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Arrival Delay</th>
+              <th mat-header-cell *matHeaderCellDef>Arrival Delay</th>
               <td mat-cell *matCellDef="let element">
                 <span [class]="getDelayClass(element.delay)">
                   {{element.delay | formatDelay}}
@@ -250,7 +250,7 @@
             </ng-container>
 
             <ng-container matColumnDef="arrivalPlatform">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Arrival Platform</th>
+              <th mat-header-cell *matHeaderCellDef>Arrival Platform</th>
               <td mat-cell *matCellDef="let element">
                 <span class="platform-badge">{{element.platform || '--'}}</span>
               </td>

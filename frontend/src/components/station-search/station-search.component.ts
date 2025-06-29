@@ -10,7 +10,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
-import { MatSortModule, MatSort } from '@angular/material/sort';
+
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { HttpClient } from '@angular/common/http';
 import { Station, StationService } from '../../services/station.service';
@@ -32,7 +32,7 @@ import { DateTimeFormatPipe } from '../../pipes/date-time-format.pipe';
     MatIconModule,
     MatProgressSpinnerModule,
     MatTableModule,
-    MatSortModule,
+
     MatPaginatorModule,
     DateTimeFormatPipe,
     FormatDelayPipe
@@ -47,7 +47,7 @@ import { DateTimeFormatPipe } from '../../pipes/date-time-format.pipe';
 export class StationSearchComponent implements OnInit, OnDestroy {
   @Output() searchEvent = new EventEmitter<string>();
   @Output() arrivalsLoaded = new EventEmitter<any[]>();
-  @ViewChild(MatSort) sort!: MatSort;
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   
   stations: Station[] = [];
