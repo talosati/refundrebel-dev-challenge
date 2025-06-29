@@ -1,7 +1,7 @@
 <div class="journey-search">
   <mat-card class="search-card">
     <mat-card-header>
-      <mat-card-title>Search for Journeys</mat-card-title>
+      <mat-card-title>Search for Direct train journeys</mat-card-title>
     </mat-card-header>
     
     <mat-card-content>
@@ -54,7 +54,7 @@
   </mat-card>
   
   <div *ngIf="journeys && journeys.length > 0" class="results-container">
-    <h3>Journeys</h3>
+    <h3>Direct train journeys (no transfers)</h3>
     <div class="table-container">
       <table mat-table [dataSource]="journeys" class="journey-table">
         <ng-container matColumnDef="id">

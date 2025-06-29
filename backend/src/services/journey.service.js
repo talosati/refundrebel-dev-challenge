@@ -22,10 +22,17 @@ class JourneyService {
         }
       });
       const filteredJourneys = response.data.journeys.filter(journey => {
-          const products = journey.legs[0].origin.products;
-          const unwantedProducts = ['suburban', 'subway', 'tram', 'bus', 'taxi', 'ferry'];
-          return unwantedProducts.every(product => products[product] === false);
-        });
+        const origin = journey.legs[0].origin;
+        const station = origin.station;
+        const destination = journey.legs[0].destination;
+
+        console.log("journey",station.id, destination.id, from, to);
+        if (station.id !== from || destination.id !== to) return false;
+
+        const products = origin.products;
+        const unwantedProducts = ['suburban', 'subway', 'tram', 'bus', 'taxi', 'ferry'];
+        return unwantedProducts.every(product => products[product] === false);
+      });
 
       return Journey.fromRawJourneys(filteredJourneys);
     } catch (error) {
