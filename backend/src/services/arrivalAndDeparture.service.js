@@ -12,7 +12,6 @@ class ArrivalAndDepartureService {
    */
   async getArrivalsAndDeparturesByStationId(stationId) {
     try {
-      // First get arrivals
       const arrivalsResponse = await axios.get(`${DB_VENDO_BASE_URL}/stops/${stationId}/arrivals`, {
         headers: {
           'Origin': FRONTEND_URL,
@@ -20,7 +19,6 @@ class ArrivalAndDepartureService {
         }
       });
 
-      // Then get departures
       const departuresResponse = await axios.get(`${DB_VENDO_BASE_URL}/stops/${stationId}/departures`, {
         headers: {
           'Origin': FRONTEND_URL,
@@ -29,13 +27,19 @@ class ArrivalAndDepartureService {
       });
 
       const rawArrivals = arrivalsResponse.data.arrivals.filter(arrival => {
-        const p = arrival.stop.products;
-        return p && (p.national || p.nationalExpress || p.regional || p.regionalExpress);
+        if (arrival.line.mode === 'bus' || arrival.line.productName === 'BUS') return false;
+
+        const products = arrival.stop.products;
+        const unwantedProducts = ['suburban', 'subway', 'tram', 'bus', 'taxi', 'ferry'];
+        return unwantedProducts.every(product => products[product] === false);
       });
 
       const rawDepartures = departuresResponse.data.departures.filter(departure => {
-        const p = departure.stop.products;
-        return p && (p.national || p.nationalExpress || p.regional || p.regionalExpress);
+        if (departure.line.mode === 'bus' || departure.line.productName === 'BUS') return false;
+
+        const products = departure.stop.products;
+        const unwantedProducts = ['suburban', 'subway', 'tram', 'bus', 'taxi', 'ferry'];
+        return unwantedProducts.every(product => products[product] === false);
       });
       
       const arrivals = await StationEvent.fromRawStationEvents(rawArrivals);

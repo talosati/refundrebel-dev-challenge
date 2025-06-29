@@ -22,12 +22,12 @@ class JourneyService {
         }
       });
       const filteredJourneys = response.data.journeys.filter(journey => {
-        const origin = journey.legs[0].origin;
-        const station = origin.station;
-        const destination = journey.legs[0].destination;
 
-        console.log("journey",station.id, destination.id, from, to);
-        if (station.id !== from || destination.id !== to) return false;
+        const origin = journey.legs[0].origin;
+        const destination = journey.legs[0].destination;
+        const line = journey.legs[0].line;
+    
+        if (origin?.station?.id !== from || destination?.id !== to || line.mode === 'bus' || line.productName === 'BUS' || line.productName === 'S' ) return false;
 
         const products = origin.products;
         const unwantedProducts = ['suburban', 'subway', 'tram', 'bus', 'taxi', 'ferry'];
