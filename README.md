@@ -10,6 +10,8 @@ This is a full-stack application with a frontend built using Angular and a backe
 - RxJS
 - Angular CLI
 - Angular Material (Material Design)
+- Karma (test runner)
+- Jasmine (testing framework)
 
 ### Backend
 - Node.js 20 (with Alpine Linux)
@@ -50,12 +52,12 @@ This is a full-stack application with a frontend built using Angular and a backe
    ```bash
    docker compose up --build
    ```
-   This will build and start all the services (frontend, backend, MongoDB, and DB-Vendo Client).
+   This will build and start all the services (frontend, backend, MongoDB).
 
 3. Access the application:
    - Frontend: http://localhost:4200
    - Backend API: http://localhost:3000
-   - DB-Vendo Client: http://localhost:3001
+   - HAFAS API: http://localhost:3001
    - **API Documentation (Swagger UI)**: http://localhost:3000/api-docs
 
 ### Development Workflow
