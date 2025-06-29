@@ -5,18 +5,15 @@
     </mat-card-header>
     
     <mat-card-content>
-      <form (submit)="$event.preventDefault(); onSearch()" class="search-form">
+      <form [formGroup]="filterForm" (submit)="$event.preventDefault(); onSearch()" class="search-form">
         <mat-form-field appearance="outline" class="form-field">
           <mat-label>Station Name</mat-label>
           <input 
             matInput 
             type="text"
             [matAutocomplete]="auto"
-            [(ngModel)]="searchTerm"
-            (input)="onInputChange($any($event.target).value)"
+            formControlName="searchTerm"
             [placeholder]="!stationsLoaded ? 'Loading stations...' : 'Start typing a station name...'"
-            name="searchTerm"
-            [disabled]="!stationsLoaded"
             #searchInput>
           <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onOptionSelected($event.option.value)">
             <mat-option *ngFor="let station of filteredStations | async" [value]="station">
@@ -49,7 +46,7 @@
             color="primary" 
             class="search-button"
             type="submit"
-            [disabled]="!searchTerm.trim()">
+            [disabled]="!filterForm.get('searchTerm')?.value?.trim?.()">
             Search
           </button>
         </div>
@@ -74,9 +71,33 @@
       </div>
 
       <div class="departures-container" *ngIf="departuresDataSource.length > 0">
-        <h3>Departures</h3>
+        <div class="departures-header">
+          <h3>Departures</h3>
+          <form [formGroup]="filterForm" class="delay-filters">
+            <mat-form-field appearance="outline" class="delay-filter">
+              <mat-label>Min Delay (min)</mat-label>
+              <input matInput type="number" min="0" formControlName="minDelay" placeholder="Min">
+              <mat-hint>Minutes</mat-hint>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="delay-filter">
+              <mat-label>Max Delay (min)</mat-label>
+              <input matInput type="number" min="0" formControlName="maxDelay" placeholder="Max">
+              <mat-hint>Minutes</mat-hint>
+            </mat-form-field>
+            <button 
+              mat-stroked-button 
+              color="warn" 
+              type="button"
+              (click)="onClearFilters()"
+              [disabled]="!filterForm.dirty"
+              class="clear-filters"
+              aria-label="Clear filters">
+              Clear Filters
+            </button>
+          </form>
+        </div>
         <div class="table-container desktop-view">
-          <table mat-table [dataSource]="departuresDataSource" matSort class="departures-table">
+          <table mat-table [dataSource]="filteredDepartures" matSort class="departures-table">
                
             <ng-container matColumnDef="station">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>From</th>
@@ -116,7 +137,16 @@
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedDepartureColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedDepartureColumns;"></tr>
+            <tr 
+              mat-row 
+              *matRowDef="let row; columns: displayedDepartureColumns;"
+              [class.highlighted]="row.delay > 0">
+            </tr>
+            <tr class="mat-row no-results" *ngIf="filteredDepartures.length === 0">
+              <td class="mat-cell" [attr.colspan]="displayedDepartureColumns.length">
+                No departures match the current filters.
+              </td>
+            </tr>
           </table>
         </div>
         
